@@ -1,4 +1,4 @@
-package com.github.nikitavbv.ServiceMonitor
+package com.github.nikitavbv.servicemonitor
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication

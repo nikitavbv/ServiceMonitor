@@ -1,4 +1,4 @@
-package com.github.nikitavbv.ServiceMonitor
+package com.github.nikitavbv.servicemonitor
 
 import org.junit.Test
 import org.junit.runner.RunWith
