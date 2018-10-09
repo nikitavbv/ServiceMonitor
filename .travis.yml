@@ -1,0 +1,12 @@
+sudo: false
+language: java
+jdk:
+  - openjdk8
+
+before_install:
+  - mv src/main/resources/application.properties.ci src/main/resources/application.properties
+  - chmod +x gradlew
+  - chmod +x gradle/wrapper/gradle-wrapper.jar
+
+script:
+  - ./gradlew test build --scan
