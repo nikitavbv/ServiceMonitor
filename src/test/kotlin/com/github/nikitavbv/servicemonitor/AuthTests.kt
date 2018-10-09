@@ -26,7 +26,7 @@ class AuthTests {
         val headers = HttpHeaders()
         headers.add("Content-type", "application/json")
         val result = testRestTemplate.exchange(
-                "/users/signup",
+                "/users",
                 HttpMethod.POST,
                 HttpEntity("not_a_json", headers),
                 Map::class.java
@@ -41,7 +41,7 @@ class AuthTests {
         val headers = HttpHeaders()
         headers.add("Content-type", "application/json")
         val result = testRestTemplate.exchange(
-                "/users/signup",
+                "/users",
                 HttpMethod.POST,
                 HttpEntity("{\"username\": \"admin\"}", headers), // no password
                 Map::class.java
@@ -53,16 +53,17 @@ class AuthTests {
     }
 
     @Test
-    fun `sign up`() {
+    fun `sign up non-admin`() {
         val usersBeforeSignUp = applicationUserRepository.count()
         val signUpHeaders = HttpHeaders()
         signUpHeaders.add("Content-type", "application/json")
         val result = testRestTemplate.exchange(
-                "/users/signup",
+                "/users",
                 HttpMethod.POST,
                 HttpEntity("""{
                     "username": "admin",
-                    "password": "password"
+                    "password": "password",
+                    "isAdmin": false
                 }""".trimIndent(), signUpHeaders),
                 Map::class.java
         )
@@ -70,6 +71,52 @@ class AuthTests {
         assertEquals(HttpStatus.OK, result.statusCode)
         assertTrue(result.body?.contains("userID")!!)
         assertEquals(usersBeforeSignUp+1, applicationUserRepository.count())
+
+        val userID = result.body?.get("userID")!!.toString().toLong()
+        val userAdded = applicationUserRepository.findById(userID)
+        assertFalse(userAdded.get().isAdmin)
+
+        applicationUserRepository.deleteById(result.body?.get("userID").toString().toLong())
+        assertEquals(usersBeforeSignUp, applicationUserRepository.count())
+    }
+
+    @Test
+    fun `sign up admin`() {
+        val usersBeforeSignUp = applicationUserRepository.count()
+        val signUpHeaders = HttpHeaders()
+        signUpHeaders.add("Content-type", "application/json")
+        val result = testRestTemplate.exchange(
+                "/users",
+                HttpMethod.POST,
+                HttpEntity("""{
+                    "username": "admin",
+                    "password": "password",
+                    "isAdmin": true
+                }""".trimIndent(), signUpHeaders),
+                Map::class.java
+        )
+        assertNotNull(result)
+        assertEquals(HttpStatus.OK, result.statusCode)
+        assertTrue(result.body?.contains("userID")!!)
+        assertEquals(usersBeforeSignUp+1, applicationUserRepository.count())
+
+        val userID = result.body?.get("userID")!!.toString().toLong()
+        val userAdded = applicationUserRepository.findById(userID)
+        assertTrue(userAdded.get().isAdmin)
+
+        // check that creating one more admin fails
+        val secondResult = testRestTemplate.exchange(
+                "/users",
+                HttpMethod.POST,
+                HttpEntity("""{
+                    "username": "secondUser",
+                    "password": "password"
+                }""".trimIndent(), signUpHeaders),
+                Map::class.java
+        )
+        assertNotNull(secondResult)
+        assertEquals(HttpStatus.FORBIDDEN, secondResult.statusCode)
+        assertEquals("Auth required for creating users", secondResult.body?.get("message"))
 
         applicationUserRepository.deleteById(result.body?.get("userID").toString().toLong())
         assertEquals(usersBeforeSignUp, applicationUserRepository.count())
@@ -175,6 +222,103 @@ class AuthTests {
         assertNotNull(result)
         assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
         assertTrue(result.body!!.contains("Access Denied"))
+    }
+
+    @Test
+    fun `create admin user with admin rights`() {
+        val usersBeforeAdding = applicationUserRepository.count()
+        val user = ApplicationUser(
+                username="admin",
+                password="\$2a\$10\$HEXlSrByZSsRozCyDCil1uZmXF1u2v6ky9UdXNkv7u6KdsZVujFZ2", // "password"
+                isAdmin = true
+        )
+        applicationUserRepository.save(user)
+
+        val loginHeaders = HttpHeaders()
+        loginHeaders.add("Content-type", "application/json")
+        val result = testRestTemplate.exchange(
+                "/login",
+                HttpMethod.POST,
+                HttpEntity("""{
+                    "username": "admin",
+                    "password": "password"
+                }""".trimMargin(), loginHeaders),
+                Map::class.java
+        )
+        val authHeader = result.headers["Authorization"]?.get(0)
+
+        // add second user
+        val addUserHeaders = HttpHeaders()
+        addUserHeaders.add("Content-type", "application/json")
+        addUserHeaders.add("Authorization", authHeader)
+        val addUserResult = testRestTemplate.exchange(
+                "/users",
+                HttpMethod.POST,
+                HttpEntity("""{
+                    "username": "admin",
+                    "password": "password",
+                    "isAdmin": true
+                }""".trimIndent(), addUserHeaders),
+                Map::class.java
+        )
+        assertNotNull(addUserResult)
+        assertEquals(HttpStatus.OK, addUserResult.statusCode)
+        assertTrue(addUserResult.body?.contains("userID")!!)
+        assertEquals(usersBeforeAdding+2, applicationUserRepository.count())
+
+        val userID = addUserResult.body?.get("userID")!!.toString().toLong()
+        val userAdded = applicationUserRepository.findById(userID)
+        assertTrue(userAdded.get().isAdmin)
+
+        applicationUserRepository.deleteById(addUserResult.body?.get("userID").toString().toLong())
+        applicationUserRepository.delete(user)
+        assertEquals(usersBeforeAdding, applicationUserRepository.count())
+    }
+
+    @Test
+    fun `create admin user without admin rights`() {
+        val usersBeforeAdding = applicationUserRepository.count()
+        val user = ApplicationUser(
+                username="admin",
+                password="\$2a\$10\$HEXlSrByZSsRozCyDCil1uZmXF1u2v6ky9UdXNkv7u6KdsZVujFZ2", // "password"
+                isAdmin = false
+        )
+        applicationUserRepository.save(user)
+
+        val loginHeaders = HttpHeaders()
+        loginHeaders.add("Content-type", "application/json")
+        val result = testRestTemplate.exchange(
+                "/login",
+                HttpMethod.POST,
+                HttpEntity("""{
+                    "username": "admin",
+                    "password": "password"
+                }""".trimMargin(), loginHeaders),
+                Map::class.java
+        )
+        val authHeader = result.headers["Authorization"]?.get(0)
+
+        // try adding second user
+        val addUserHeaders = HttpHeaders()
+        addUserHeaders.add("Content-type", "application/json")
+        addUserHeaders.add("Authorization", authHeader)
+        val addUserResult = testRestTemplate.exchange(
+                "/users",
+                HttpMethod.POST,
+                HttpEntity("""{
+                    "username": "admin",
+                    "password": "password",
+                    "isAdmin": true
+                }""".trimIndent(), addUserHeaders),
+                Map::class.java
+        )
+        assertNotNull(addUserResult)
+        assertEquals(HttpStatus.FORBIDDEN, addUserResult.statusCode)
+        assertEquals("Non-admin users are not allowed to create admin users", addUserResult.body?.get("message"))
+        assertEquals(usersBeforeAdding+1, applicationUserRepository.count())
+
+        applicationUserRepository.delete(user)
+        assertEquals(usersBeforeAdding, applicationUserRepository.count())
     }
 
 }

@@ -1,6 +1,8 @@
 package com.github.nikitavbv.servicemonitor
 
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
+import com.github.nikitavbv.servicemonitor.security.PermissionDeniedException
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.web.bind.annotation.ControllerAdvice
@@ -19,6 +21,11 @@ class CustomControllerAdvice {
             ))
         }
         return ResponseEntity.badRequest().body(mapOf("error" to "failed to parse request"))
+    }
+
+    @ExceptionHandler(PermissionDeniedException::class)
+    fun handlePermissionDeniedException(exception: PermissionDeniedException): ResponseEntity<Map<String, String?>> {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(mapOf("message" to exception.message))
     }
 
 }

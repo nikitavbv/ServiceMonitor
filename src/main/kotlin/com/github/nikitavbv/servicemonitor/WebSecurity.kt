@@ -25,7 +25,7 @@ class WebSecurity(val userDetailsService: UserDetailsService,
     override fun configure(http: HttpSecurity) {
         http.csrf().disable().authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/login").permitAll()
-                .antMatchers(HttpMethod.POST, "/users/signup").permitAll()
+                .antMatchers(HttpMethod.POST, "/users").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilter(JWTAuthenticationFilter(securityProperties, authenticationManager()))

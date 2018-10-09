@@ -8,12 +8,15 @@ import javax.validation.constraints.NotEmpty
 
 @Entity
 data class ApplicationUser(
-        @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-        val id: Long? = null,
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Long? = null,
 
-        @NotEmpty(message = "Username is required")
-        var username: String,
+    @NotEmpty(message = "Username is required")
+    var username: String,
 
-        @NotEmpty(message = "Password is required")
-        var password: String
+    @NotEmpty(message = "Password is required")
+    var password: String,
+
+    var isAdmin: Boolean = false
+
 )
