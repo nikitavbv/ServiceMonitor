@@ -11,7 +11,7 @@ before_install:
 
 script:
   - ./ktlint "src/**/*.kt"
-  - ./gradlew test build --scan
+  - ./gradlew detekt test build --scan
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
