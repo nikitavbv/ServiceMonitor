@@ -27,5 +27,4 @@ class CustomControllerAdvice {
     fun handlePermissionDeniedException(exception: PermissionDeniedException): ResponseEntity<Map<String, String?>> {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(mapOf("message" to exception.message))
     }
-
 }

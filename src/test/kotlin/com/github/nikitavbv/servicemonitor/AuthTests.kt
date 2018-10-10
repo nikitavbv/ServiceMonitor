@@ -2,14 +2,20 @@ package com.github.nikitavbv.servicemonitor
 
 import com.github.nikitavbv.servicemonitor.user.ApplicationUser
 import com.github.nikitavbv.servicemonitor.user.ApplicationUserRepository
-import junit.framework.TestCase.*
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.test.context.junit4.SpringRunner
-import org.springframework.http.*
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpMethod
+import org.springframework.http.HttpEntity
+import org.springframework.http.HttpStatus
+import junit.framework.TestCase.assertNotNull
+import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertTrue
+import junit.framework.TestCase.assertFalse
 
 @RunWith(SpringRunner::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -70,7 +76,7 @@ class AuthTests {
         assertNotNull(result)
         assertEquals(HttpStatus.OK, result.statusCode)
         assertTrue(result.body?.contains("userID")!!)
-        assertEquals(usersBeforeSignUp+1, applicationUserRepository.count())
+        assertEquals(usersBeforeSignUp + 1, applicationUserRepository.count())
 
         val userID = result.body?.get("userID")!!.toString().toLong()
         val userAdded = applicationUserRepository.findById(userID)
@@ -98,7 +104,7 @@ class AuthTests {
         assertNotNull(result)
         assertEquals(HttpStatus.OK, result.statusCode)
         assertTrue(result.body?.contains("userID")!!)
-        assertEquals(usersBeforeSignUp+1, applicationUserRepository.count())
+        assertEquals(usersBeforeSignUp + 1, applicationUserRepository.count())
 
         val userID = result.body?.get("userID")!!.toString().toLong()
         val userAdded = applicationUserRepository.findById(userID)
@@ -125,8 +131,8 @@ class AuthTests {
     @Test
     fun `login with correct credentials`() {
         val user = ApplicationUser(
-                username="admin",
-                password="\$2a\$10\$HEXlSrByZSsRozCyDCil1uZmXF1u2v6ky9UdXNkv7u6KdsZVujFZ2" // "password"
+                username = "admin",
+                password = "\$2a\$10\$HEXlSrByZSsRozCyDCil1uZmXF1u2v6ky9UdXNkv7u6KdsZVujFZ2" // "password"
         )
         applicationUserRepository.save(user)
 
@@ -169,8 +175,8 @@ class AuthTests {
     @Test
     fun `login with wrong username`() {
         val user = ApplicationUser(
-                username="admin",
-                password="\$2a\$10\$HEXlSrByZSsRozCyDCil1uZmXF1u2v6ky9UdXNkv7u6KdsZVujFZ2" // "password"
+                username = "admin",
+                password = "\$2a\$10\$HEXlSrByZSsRozCyDCil1uZmXF1u2v6ky9UdXNkv7u6KdsZVujFZ2" // "password"
         )
         applicationUserRepository.save(user)
 
@@ -194,8 +200,8 @@ class AuthTests {
     @Test
     fun `login with wrong password`() {
         val user = ApplicationUser(
-                username="admin",
-                password="\$2a\$10\$HEXlSrByZSsRozCyDCil1uZmXF1u2v6ky9UdXNkv7u6KdsZVujFZ2" // "password"
+                username = "admin",
+                password = "\$2a\$10\$HEXlSrByZSsRozCyDCil1uZmXF1u2v6ky9UdXNkv7u6KdsZVujFZ2" // "password"
         )
         applicationUserRepository.save(user)
 
@@ -228,8 +234,8 @@ class AuthTests {
     fun `create admin user with admin rights`() {
         val usersBeforeAdding = applicationUserRepository.count()
         val user = ApplicationUser(
-                username="admin",
-                password="\$2a\$10\$HEXlSrByZSsRozCyDCil1uZmXF1u2v6ky9UdXNkv7u6KdsZVujFZ2", // "password"
+                username = "admin",
+                password = "\$2a\$10\$HEXlSrByZSsRozCyDCil1uZmXF1u2v6ky9UdXNkv7u6KdsZVujFZ2", // "password"
                 isAdmin = true
         )
         applicationUserRepository.save(user)
@@ -264,7 +270,7 @@ class AuthTests {
         assertNotNull(addUserResult)
         assertEquals(HttpStatus.OK, addUserResult.statusCode)
         assertTrue(addUserResult.body?.contains("userID")!!)
-        assertEquals(usersBeforeAdding+2, applicationUserRepository.count())
+        assertEquals(usersBeforeAdding + 2, applicationUserRepository.count())
 
         val userID = addUserResult.body?.get("userID")!!.toString().toLong()
         val userAdded = applicationUserRepository.findById(userID)
@@ -279,8 +285,8 @@ class AuthTests {
     fun `create admin user without admin rights`() {
         val usersBeforeAdding = applicationUserRepository.count()
         val user = ApplicationUser(
-                username="admin",
-                password="\$2a\$10\$HEXlSrByZSsRozCyDCil1uZmXF1u2v6ky9UdXNkv7u6KdsZVujFZ2", // "password"
+                username = "admin",
+                password = "\$2a\$10\$HEXlSrByZSsRozCyDCil1uZmXF1u2v6ky9UdXNkv7u6KdsZVujFZ2", // "password"
                 isAdmin = false
         )
         applicationUserRepository.save(user)
@@ -315,10 +321,9 @@ class AuthTests {
         assertNotNull(addUserResult)
         assertEquals(HttpStatus.FORBIDDEN, addUserResult.statusCode)
         assertEquals("Non-admin users are not allowed to create admin users", addUserResult.body?.get("message"))
-        assertEquals(usersBeforeAdding+1, applicationUserRepository.count())
+        assertEquals(usersBeforeAdding + 1, applicationUserRepository.count())
 
         applicationUserRepository.delete(user)
         assertEquals(usersBeforeAdding, applicationUserRepository.count())
     }
-
 }

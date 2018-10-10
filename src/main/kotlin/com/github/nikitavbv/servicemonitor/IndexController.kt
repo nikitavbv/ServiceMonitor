@@ -8,5 +8,4 @@ class IndexController {
 
     @GetMapping("/")
     fun welcome() = "Welcome!"
-
 }

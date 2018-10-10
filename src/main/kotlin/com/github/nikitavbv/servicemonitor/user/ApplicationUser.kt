@@ -18,5 +18,4 @@ data class ApplicationUser(
     var password: String,
 
     var isAdmin: Boolean = false
-
 )

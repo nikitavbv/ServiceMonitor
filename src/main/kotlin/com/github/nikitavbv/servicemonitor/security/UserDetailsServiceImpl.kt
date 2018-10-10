@@ -17,5 +17,4 @@ class UserDetailsServiceImpl(val userRepository: ApplicationUserRepository) : Us
         val user = userRepository.findByUsername(username)
         return User(user.username, user.password, emptyList())
     }
-
 }

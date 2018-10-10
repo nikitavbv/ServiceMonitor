@@ -13,7 +13,7 @@ import javax.validation.Valid
 
 @RestController
 @RequestMapping("/users")
-class UserController (
+class UserController(
     val userRepository: ApplicationUserRepository,
     val bCryptPasswordEncoder: BCryptPasswordEncoder
 ) {
@@ -35,5 +35,4 @@ class UserController (
         userRepository.save(user)
         return SignUpResult(user.id ?: throw RuntimeException("Failed to save user"))
     }
-
 }

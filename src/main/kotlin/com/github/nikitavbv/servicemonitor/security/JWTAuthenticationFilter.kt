@@ -12,18 +12,18 @@ import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.User
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import java.io.IOException
-import java.util.*
 import javax.servlet.FilterChain
 import javax.servlet.ServletException
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import io.jsonwebtoken.security.Keys
 import io.jsonwebtoken.io.Decoders
+import java.util.Date
 
 class JWTAuthenticationFilter(
-        private val securityProperties: SecurityProperties,
-        authManager: AuthenticationManager
-): UsernamePasswordAuthenticationFilter() {
+    private val securityProperties: SecurityProperties,
+    authManager: AuthenticationManager
+) : UsernamePasswordAuthenticationFilter() {
 
     init {
         authenticationManager = authManager
@@ -31,8 +31,8 @@ class JWTAuthenticationFilter(
 
     @Throws(AuthenticationException::class, IOException::class, ServletException::class)
     override fun attemptAuthentication(
-            req: HttpServletRequest,
-            res: HttpServletResponse
+        req: HttpServletRequest,
+        res: HttpServletResponse
     ): Authentication {
         val creds = ObjectMapper().readValue(req.inputStream, ApplicationUser::class.java)
         return authenticationManager.authenticate(
@@ -46,9 +46,11 @@ class JWTAuthenticationFilter(
 
     @Throws(IOException::class, ServletException::class)
     override fun successfulAuthentication(
-            req: HttpServletRequest,
-            res: HttpServletResponse, chain: FilterChain?,
-            auth: Authentication) {
+        req: HttpServletRequest,
+        res: HttpServletResponse,
+        chain: FilterChain?,
+        auth: Authentication
+    ) {
         val keyBytes = Decoders.BASE64.decode(securityProperties.secret)
         val key = Keys.hmacShaKeyFor(keyBytes)
 
@@ -60,5 +62,4 @@ class JWTAuthenticationFilter(
 
         res.addHeader(HEADER_STRING, "$TOKEN_PREFIX $jwt")
     }
-
 }
