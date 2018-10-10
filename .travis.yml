@@ -5,10 +5,12 @@ jdk:
 
 before_install:
   - mv src/main/resources/application.properties.ci src/main/resources/application.properties
+  - curl -sSLO https://github.com/shyiko/ktlint/releases/download/0.29.0/ktlint && chmod a+x ktlint
   - chmod +x gradlew
   - chmod +x gradle/wrapper/gradle-wrapper.jar
 
 script:
+  - ./ktlint "src/**/*.kt"
   - ./gradlew test build --scan
 
 after_success:
