@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 class CustomControllerAdvice {
 
     @ExceptionHandler(HttpMessageNotReadableException::class)
-    fun handleHttpMessageNotReadableException(exception: HttpMessageNotReadableException): ResponseEntity<Map<String, Any>> {
+    fun handleHttpMessageNotReadableException(
+        exception: HttpMessageNotReadableException
+    ): ResponseEntity<Map<String, Any>> {
         if (exception.cause!!::class == MissingKotlinParameterException::class) {
             val missingParameterName = (exception.cause as MissingKotlinParameterException).parameter.name!!
             return ResponseEntity.badRequest().body(mapOf(

@@ -43,10 +43,9 @@ class JWTAuthorizationFilter(
                     .parseClaimsJws(token.replace(TOKEN_PREFIX, ""))
                     .body
                     .subject
-            return if (user != null)
-                UsernamePasswordAuthenticationToken(user, null, emptyList<GrantedAuthority>())
-            else
-                return null
+            if (user != null) {
+                return UsernamePasswordAuthenticationToken(user, null, emptyList<GrantedAuthority>())
+            }
         }
         return null
     }

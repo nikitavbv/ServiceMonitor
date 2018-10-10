@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import java.lang.RuntimeException
 import javax.servlet.http.HttpServletRequest
 import javax.validation.Valid
 
@@ -24,15 +23,22 @@ class UserController(
     @PostMapping
     fun signUp(httpRequest: HttpServletRequest, @RequestBody @Valid user: ApplicationUser): SignUpResult {
         user.password = bCryptPasswordEncoder.encode(user.password)
-        if (httpRequest.remoteUser != null) {
-            val requestUser = applicationUserRepository.findByUsername(httpRequest.remoteUser)
-            if (!requestUser.isAdmin && user.isAdmin) {
+        val requestUser: ApplicationUser? = when (httpRequest.remoteUser) {
+            null -> null
+            else -> applicationUserRepository.findByUsername(httpRequest.remoteUser)
+        }
+        checkCreateUserPermissions(user, requestUser)
+        userRepository.save(user)
+        return SignUpResult(user.id ?: throw SignUpException("Failed to save user"))
+    }
+
+    fun checkCreateUserPermissions(userToCreate: ApplicationUser, creator: ApplicationUser?) {
+        if (creator != null) {
+            if (!creator.isAdmin && userToCreate.isAdmin) {
                 throw PermissionDeniedException("Non-admin users are not allowed to create admin users")
             }
         } else if (applicationUserRepository.count() != 0L) {
             throw PermissionDeniedException("Auth required for creating users")
         }
-        userRepository.save(user)
-        return SignUpResult(user.id ?: throw RuntimeException("Failed to save user"))
     }
 }
