@@ -1,8 +1,10 @@
 package com.github.nikitavbv.servicemonitor
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.github.nikitavbv.servicemonitor.project.CreateProjectResult
 import com.github.nikitavbv.servicemonitor.project.ProjectRepository
 import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertNotNull
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.anything
 import org.junit.Before
@@ -56,7 +58,20 @@ class ProjectTests {
             .andExpect(jsonPath("$.id", anything()))
             .andExpect(jsonPath("$.name", equalTo("Project name")))
             .andDo {
-                assertEquals(projectsBeforeTest + 1, projectRepository.count())
+                result ->
+                run {
+                    val projectInfo = convertJSONStringToObject(
+                        result.response.contentAsString,
+                        CreateProjectResult::class.java
+                    )
+                    assertEquals(projectsBeforeTest + 1, projectRepository.count())
+                    assertEquals("Project name", projectInfo.name)
+
+                    val project = projectRepository.getOne(
+                        projectInfo.id ?: throw AssertionError("No id set for project")
+                    )
+                    assertNotNull(project.apiKey)
+                }
             }
     }
 }
