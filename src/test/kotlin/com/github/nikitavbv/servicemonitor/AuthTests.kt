@@ -54,7 +54,7 @@ class AuthTests {
         )
         assertNotNull(result)
         assertEquals(HttpStatus.BAD_REQUEST, result.statusCode)
-        assertEquals("missing parameter", result.body?.get("error"))
+        assertEquals("missing_parameter", result.body?.get("error"))
         assertEquals("password", result.body?.get("missing_parameter"))
     }
 

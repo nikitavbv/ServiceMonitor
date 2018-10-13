@@ -34,7 +34,7 @@ data class Project(
         joinColumns = [JoinColumn(name = "project_id", referencedColumnName = "id")],
         inverseJoinColumns = [JoinColumn(name = "agent_id", referencedColumnName = "id")]
     )
-    var agents: List<Agent> = mutableListOf()
+    var agents: MutableList<Agent> = mutableListOf()
 
 ) {
 

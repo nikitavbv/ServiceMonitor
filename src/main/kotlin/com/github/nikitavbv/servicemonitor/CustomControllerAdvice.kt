@@ -1,6 +1,7 @@
 package com.github.nikitavbv.servicemonitor
 
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
+import com.github.nikitavbv.servicemonitor.exceptions.MissingParameterException
 import com.github.nikitavbv.servicemonitor.security.PermissionDeniedException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -18,11 +19,21 @@ class CustomControllerAdvice {
         if (exception.cause!!::class == MissingKotlinParameterException::class) {
             val missingParameterName = (exception.cause as MissingKotlinParameterException).parameter.name!!
             return ResponseEntity.badRequest().body(mapOf(
-                    "error" to "missing parameter",
+                    "error" to "missing_parameter",
                     "missing_parameter" to missingParameterName
             ))
         }
         return ResponseEntity.badRequest().body(mapOf("error" to "failed to parse request"))
+    }
+
+    @ExceptionHandler(MissingParameterException::class)
+    fun handleMissingParameterException(
+        exception: MissingParameterException
+    ): ResponseEntity<Map<String, String?>> {
+        return ResponseEntity.badRequest().body(mapOf(
+            "error" to "missing_parameter",
+            "missing_parameter" to exception.parameterName
+        ))
     }
 
     @ExceptionHandler(PermissionDeniedException::class)
