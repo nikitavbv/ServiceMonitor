@@ -14,10 +14,10 @@ import javax.persistence.PrePersist
 @Entity
 data class Agent(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Long,
+    var id: Long? = null,
 
-    var description: String?,
-    var apiKey: String?,
+    var description: String? = null,
+    var apiKey: String? = null,
 
     @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "agent")
@@ -25,7 +25,7 @@ data class Agent(
 ) {
 
     @PrePersist
-    fun generateAPIKey() {
+    private fun generateAPIKey() {
         this.apiKey = UUID.randomUUID().toString()
     }
 }

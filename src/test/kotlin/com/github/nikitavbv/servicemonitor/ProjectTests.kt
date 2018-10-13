@@ -2,9 +2,11 @@ package com.github.nikitavbv.servicemonitor
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.nikitavbv.servicemonitor.project.CreateProjectResult
+import com.github.nikitavbv.servicemonitor.project.Project
 import com.github.nikitavbv.servicemonitor.project.ProjectRepository
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNotNull
+import junit.framework.TestCase.assertNull
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.anything
 import org.junit.Before
@@ -73,5 +75,22 @@ class ProjectTests {
                     assertNotNull(project.apiKey)
                 }
             }
+    }
+
+    @Test
+    fun `test project api key generation`() {
+        val project = Project(name = "Test project")
+        assertNull(project.apiKey)
+        projectRepository.save(project)
+        assertNotNull(project.apiKey)
+
+        val apiKey = project.apiKey
+        val projectSecondInstance = projectRepository.getOne(
+            project.id ?: throw java.lang.AssertionError("Project id is not set")
+        )
+        assertNotNull(projectSecondInstance.apiKey)
+        assertEquals(apiKey, projectSecondInstance.apiKey)
+        projectRepository.save(project)
+        assertEquals(apiKey, projectSecondInstance.apiKey)
     }
 }

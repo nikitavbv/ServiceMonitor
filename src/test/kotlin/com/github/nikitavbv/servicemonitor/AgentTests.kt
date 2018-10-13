@@ -1,9 +1,11 @@
 package com.github.nikitavbv.servicemonitor
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.github.nikitavbv.servicemonitor.agent.Agent
 import com.github.nikitavbv.servicemonitor.agent.AgentRepository
 import com.github.nikitavbv.servicemonitor.project.Project
 import com.github.nikitavbv.servicemonitor.project.ProjectRepository
+import junit.framework.TestCase
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNotNull
 import org.hamcrest.CoreMatchers.anything
@@ -92,5 +94,22 @@ class AgentTests {
             .andExpect(status().isBadRequest)
             .andExpect(jsonPath("$.error", equalTo("missing_parameter")))
             .andExpect(jsonPath("$.missing_parameter", equalTo("projectKey")))
+    }
+
+    @Test
+    fun testAgentAPIKeyGeneration() {
+        val agent = Agent()
+        TestCase.assertNull(agent.apiKey)
+        agentRepository.save(agent)
+        assertNotNull(agent.apiKey)
+
+        val apiKey = agent.apiKey
+        val agentSecondInstance = agentRepository.getOne(
+            agent.id ?: throw java.lang.AssertionError("Agent id is not set")
+        )
+        assertNotNull(agentSecondInstance.apiKey)
+        assertEquals(apiKey, agentSecondInstance.apiKey)
+        agentRepository.save(agent)
+        assertEquals(apiKey, agentSecondInstance.apiKey)
     }
 }

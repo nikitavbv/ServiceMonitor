@@ -39,10 +39,7 @@ data class Project(
 ) {
 
     @PrePersist
-    fun generateKey() {
-        if (this.apiKey != null) {
-            return
-        }
+    private fun generateKey() {
         this.apiKey = UUID.randomUUID().toString()
     }
 }
