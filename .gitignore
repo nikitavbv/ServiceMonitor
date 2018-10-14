@@ -27,4 +27,5 @@
 
 ### Application ###
 data
+data-dev
 src/main/resources/application.properties

@@ -1,0 +1,21 @@
+version: '3'
+services:
+  db:
+    image: mariadb:10.3.10
+    environment:
+      - MYSQL_DATABASE=servicemonitor
+      - MYSQL_ROOT_PASSWORD=servicemonitorrootpassw
+      - MYSQL_USER=servicemonitor
+      - MYSQL_PASSWORD=servicemonitorpassword
+    volumes:
+      - "./data/db:/var/lib/mysql"
+  app:
+    image: nikitavbv/servicemonitor:latest
+    environment:
+      - DB_URL=jdbc:mysql://db:3306/servicemonitor
+      - DB_USERNAME=servicemonitor
+      - DB_PASSWORD=servicemonitorpassword
+    ports:
+      - "80:8080"
+    depends_on:
+      - db

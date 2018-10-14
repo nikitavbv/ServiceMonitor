@@ -7,6 +7,7 @@ WORKDIR /home/gradle/app
 
 ADD src /home/gradle/app/src
 ADD build.gradle /home/gradle/app/build.gradle
+ADD src/main/resources/application.properties.docker /home/gradle/app/src/main/resources/application.properties
 
 EXPOSE 80
 
