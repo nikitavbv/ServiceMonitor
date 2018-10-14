@@ -11,4 +11,6 @@ ADD src/main/resources/application.properties.docker /home/gradle/app/src/main/r
 
 EXPOSE 80
 
-CMD ["gradle", "bootRun"]
+RUN gradle assemble
+
+CMD ["java", "-Xmx64M", "-Xms64M", "-jar", "/home/gradle/app/build/libs/app-0.0.1-SNAPSHOT.jar"]
