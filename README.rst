@@ -2,7 +2,7 @@
 Service Monitor
 ===============
 
-|Build Status| |codecov.io|
+|Build Status| |codecov.io| |license-mit|
 
 =====
 
@@ -48,4 +48,5 @@ Alternatively, you can use individual container (this requires linking to databa
    :target: https://travis-ci.org/nikitavbv/ServiceMonitor
 .. |codecov.io| image:: https://img.shields.io/codecov/c/github/nikitavbv/ServiceMonitor/master.svg?label=coverage
    :target: https://codecov.io/github/nikitavbv/ServiceMonitor?branch=master
-.. |license| image:: https://img.shields.io/badge/License-MIT-yellow.svg :target: https://opensource.org/licenses/MIT
+.. |license-mit| image:: https://img.shields.io/badge/License-MIT-yellow.svg
+   :target: https://opensource.org/licenses/MIT
