@@ -3,6 +3,7 @@ package com.github.nikitavbv.servicemonitor.agent
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.github.nikitavbv.servicemonitor.metric.Metric
 import java.util.UUID
+import javax.persistence.CascadeType
 import javax.persistence.Entity
 import javax.persistence.FetchType
 import javax.persistence.GeneratedValue
@@ -20,7 +21,7 @@ data class Agent(
     var apiKey: String? = null,
 
     @JsonIgnore
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "agent")
+    @OneToMany(cascade = [CascadeType.ALL], fetch = FetchType.LAZY, mappedBy = "agent")
     val metrics: List<Metric> = mutableListOf()
 ) {
 

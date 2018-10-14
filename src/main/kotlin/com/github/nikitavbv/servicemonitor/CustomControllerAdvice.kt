@@ -1,6 +1,9 @@
 package com.github.nikitavbv.servicemonitor
 
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
+import com.github.nikitavbv.servicemonitor.agent.AgentNotFoundException
+import com.github.nikitavbv.servicemonitor.exceptions.InvalidParameterValueException
+import com.github.nikitavbv.servicemonitor.exceptions.MissingAPIKeyException
 import com.github.nikitavbv.servicemonitor.exceptions.MissingParameterException
 import com.github.nikitavbv.servicemonitor.security.PermissionDeniedException
 import org.springframework.http.HttpStatus
@@ -36,8 +39,38 @@ class CustomControllerAdvice {
         ))
     }
 
+    @ExceptionHandler(MissingAPIKeyException::class)
+    fun handleMissingAPIKeyException(exception: MissingAPIKeyException): ResponseEntity<Map<String, String?>> {
+        return ResponseEntity.badRequest().body(mapOf(
+            "error" to "api_key_required"
+        ))
+    }
+
+    @ExceptionHandler(InvalidParameterValueException::class)
+    fun handleInvalidParameterValueException(
+        exception: InvalidParameterValueException
+    ): ResponseEntity<Map<String, String?>> {
+        return ResponseEntity.badRequest().body(if (exception.parameterMessage != null)
+            mapOf(
+                "error" to "invalid_parameter_value",
+                "parameterName" to exception.parameterName,
+                "message" to exception.parameterMessage
+            )
+        else
+            mapOf(
+                "error" to "invalid_parameter_value",
+                "parameterName" to exception.parameterName
+            )
+        )
+    }
+
     @ExceptionHandler(PermissionDeniedException::class)
     fun handlePermissionDeniedException(exception: PermissionDeniedException): ResponseEntity<Map<String, String?>> {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(mapOf("message" to exception.message))
+    }
+
+    @ExceptionHandler(AgentNotFoundException::class)
+    fun handleAgentNotFoundException(exception: AgentNotFoundException): ResponseEntity<Map<String, String?>> {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("error" to "agent_not_found"))
     }
 }

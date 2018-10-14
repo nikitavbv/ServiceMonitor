@@ -4,5 +4,5 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 interface AgentRepository : JpaRepository<Agent, Long> {
 
-    fun findByApiKey(apiKey: String): Agent
+    fun findByApiKey(apiKey: String): Agent?
 }

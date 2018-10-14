@@ -29,6 +29,7 @@ class WebSecurity(
                 .antMatchers(HttpMethod.POST, "/login").permitAll()
                 .antMatchers(HttpMethod.POST, "/users").permitAll()
                 .antMatchers(HttpMethod.POST, AGENT_API).permitAll()
+                .antMatchers(HttpMethod.POST, METRIC_API).permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilter(JWTAuthenticationFilter(securityProperties, authenticationManager()))
