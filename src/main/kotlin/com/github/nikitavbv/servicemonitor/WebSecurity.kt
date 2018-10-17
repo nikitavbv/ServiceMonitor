@@ -27,7 +27,7 @@ class WebSecurity(
     override fun configure(http: HttpSecurity) {
         http.csrf().disable().authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/login").permitAll()
-                .antMatchers(HttpMethod.POST, "/users").permitAll()
+                .antMatchers(HttpMethod.POST, USER_API).permitAll()
                 .antMatchers(HttpMethod.POST, AGENT_API).permitAll()
                 .antMatchers(HttpMethod.POST, METRIC_API).permitAll()
                 .antMatchers(HttpMethod.GET, INIT_API).permitAll()

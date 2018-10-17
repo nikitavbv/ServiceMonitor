@@ -1,8 +1,10 @@
 package com.github.nikitavbv.servicemonitor.user
 
+import com.github.nikitavbv.servicemonitor.USER_API
 import com.github.nikitavbv.servicemonitor.security.PermissionDeniedException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -11,7 +13,7 @@ import javax.servlet.http.HttpServletRequest
 import javax.validation.Valid
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping(USER_API)
 class UserController(
     val userRepository: ApplicationUserRepository,
     val bCryptPasswordEncoder: BCryptPasswordEncoder
@@ -19,6 +21,11 @@ class UserController(
 
     @Autowired
     lateinit var applicationUserRepository: ApplicationUserRepository
+
+    @GetMapping
+    fun getUserInfo(httpRequest: HttpServletRequest): ApplicationUser {
+        return applicationUserRepository.findByUsername(httpRequest.remoteUser)
+    }
 
     @PostMapping
     fun signUp(httpRequest: HttpServletRequest, @RequestBody @Valid user: ApplicationUser): SignUpResult {

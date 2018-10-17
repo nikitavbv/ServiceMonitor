@@ -32,7 +32,7 @@ class AuthTests {
         val headers = HttpHeaders()
         headers.add("Content-type", "application/json")
         val result = testRestTemplate.exchange(
-                "/users",
+                "/api/v1/users",
                 HttpMethod.POST,
                 HttpEntity("not_a_json", headers),
                 Map::class.java
@@ -47,7 +47,7 @@ class AuthTests {
         val headers = HttpHeaders()
         headers.add("Content-type", "application/json")
         val result = testRestTemplate.exchange(
-                "/users",
+                "/api/v1/users",
                 HttpMethod.POST,
                 HttpEntity("{\"username\": \"admin\"}", headers), // no password
                 Map::class.java
@@ -64,7 +64,7 @@ class AuthTests {
         val signUpHeaders = HttpHeaders()
         signUpHeaders.add("Content-type", "application/json")
         val result = testRestTemplate.exchange(
-                "/users",
+                "/api/v1/users",
                 HttpMethod.POST,
                 HttpEntity("""{
                     "username": "admin",
@@ -92,7 +92,7 @@ class AuthTests {
         val signUpHeaders = HttpHeaders()
         signUpHeaders.add("Content-type", "application/json")
         val result = testRestTemplate.exchange(
-                "/users",
+                "/api/v1/users",
                 HttpMethod.POST,
                 HttpEntity("""{
                     "username": "admin",
@@ -112,7 +112,7 @@ class AuthTests {
 
         // check that creating one more admin fails
         val secondResult = testRestTemplate.exchange(
-                "/users",
+                "/api/v1/users",
                 HttpMethod.POST,
                 HttpEntity("""{
                     "username": "secondUser",
@@ -158,7 +158,7 @@ class AuthTests {
         verifyHeaders.add("Content-type", "application/json")
         verifyHeaders.add("Authorization", authHeader)
         val verifyResult = testRestTemplate.exchange(
-                "/",
+                "/api/v1/users",
                 HttpMethod.GET,
                 HttpEntity("", verifyHeaders),
                 String::class.java
@@ -192,7 +192,7 @@ class AuthTests {
                 Map::class.java
         )
         assertNotNull(result)
-        assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
+        assertEquals(HttpStatus.UNAUTHORIZED, result.statusCode)
 
         applicationUserRepository.delete(user)
     }
@@ -217,14 +217,17 @@ class AuthTests {
                 Map::class.java
         )
         assertNotNull(result)
-        assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
+        assertEquals(HttpStatus.UNAUTHORIZED, result.statusCode)
 
         applicationUserRepository.delete(user)
     }
 
     @Test
     fun `access denied for protected routes`() {
-        val result = testRestTemplate.getForEntity("/", String::class.java)
+        val headers = HttpHeaders()
+        headers.add("Content-type", "application/json")
+        val result = testRestTemplate.getForEntity("/api/v1/users", String::class.java)
+        println(result)
         assertNotNull(result)
         assertEquals(HttpStatus.FORBIDDEN, result.statusCode)
         assertTrue(result.body!!.contains("Access Denied"))
@@ -258,7 +261,7 @@ class AuthTests {
         addUserHeaders.add("Content-type", "application/json")
         addUserHeaders.add("Authorization", authHeader)
         val addUserResult = testRestTemplate.exchange(
-                "/users",
+                "/api/v1/users",
                 HttpMethod.POST,
                 HttpEntity("""{
                     "username": "admin",
@@ -309,7 +312,7 @@ class AuthTests {
         addUserHeaders.add("Content-type", "application/json")
         addUserHeaders.add("Authorization", authHeader)
         val addUserResult = testRestTemplate.exchange(
-                "/users",
+                "/api/v1/users",
                 HttpMethod.POST,
                 HttpEntity("""{
                     "username": "admin",
