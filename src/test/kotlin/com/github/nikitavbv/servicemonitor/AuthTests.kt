@@ -139,7 +139,7 @@ class AuthTests {
         val loginHeaders = HttpHeaders()
         loginHeaders.add("Content-type", "application/json")
         val result = testRestTemplate.exchange(
-                "/login",
+                "/api/v1/login",
                 HttpMethod.POST,
                 HttpEntity("""{
                     "username": "admin",
@@ -183,7 +183,7 @@ class AuthTests {
         val loginHeaders = HttpHeaders()
         loginHeaders.add("Content-type", "application/json")
         val result = testRestTemplate.exchange(
-                "/login",
+                "/api/v1/login",
                 HttpMethod.POST,
                 HttpEntity("""{
                     "username": "wrong_username",
@@ -208,7 +208,7 @@ class AuthTests {
         val loginHeaders = HttpHeaders()
         loginHeaders.add("Content-type", "application/json")
         val result = testRestTemplate.exchange(
-                "/login",
+                "/api/v1/login",
                 HttpMethod.POST,
                 HttpEntity("""{
                     "username": "admin",
@@ -246,7 +246,7 @@ class AuthTests {
         val loginHeaders = HttpHeaders()
         loginHeaders.add("Content-type", "application/json")
         val result = testRestTemplate.exchange(
-                "/login",
+                "/api/v1/login",
                 HttpMethod.POST,
                 HttpEntity("""{
                     "username": "admin",
@@ -297,7 +297,7 @@ class AuthTests {
         val loginHeaders = HttpHeaders()
         loginHeaders.add("Content-type", "application/json")
         val result = testRestTemplate.exchange(
-                "/login",
+                "/api/v1/login",
                 HttpMethod.POST,
                 HttpEntity("""{
                     "username": "admin",

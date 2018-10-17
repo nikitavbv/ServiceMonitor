@@ -1,6 +1,7 @@
 package com.github.nikitavbv.servicemonitor.security
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.github.nikitavbv.servicemonitor.LOGIN_API
 import com.github.nikitavbv.servicemonitor.SecurityProperties
 import com.github.nikitavbv.servicemonitor.user.ApplicationUser
 import io.jsonwebtoken.Jwts
@@ -10,7 +11,6 @@ import org.springframework.security.core.Authentication
 import org.springframework.security.core.AuthenticationException
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.User
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import java.io.IOException
 import javax.servlet.FilterChain
 import javax.servlet.ServletException
@@ -18,12 +18,14 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import io.jsonwebtoken.security.Keys
 import io.jsonwebtoken.io.Decoders
+import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher
 import java.util.Date
 
 class JWTAuthenticationFilter(
     private val securityProperties: SecurityProperties,
     authManager: AuthenticationManager
-) : UsernamePasswordAuthenticationFilter() {
+) : AbstractAuthenticationProcessingFilter(AntPathRequestMatcher(LOGIN_API, "POST")) {
 
     init {
         authenticationManager = authManager
@@ -36,11 +38,11 @@ class JWTAuthenticationFilter(
     ): Authentication {
         val creds = ObjectMapper().readValue(req.inputStream, ApplicationUser::class.java)
         return authenticationManager.authenticate(
-                UsernamePasswordAuthenticationToken(
-                        creds.username,
-                        creds.password,
-                        emptyList<GrantedAuthority>()
-                )
+            UsernamePasswordAuthenticationToken(
+                creds.username,
+                creds.password,
+                emptyList<GrantedAuthority>()
+            )
         )
     }
 
