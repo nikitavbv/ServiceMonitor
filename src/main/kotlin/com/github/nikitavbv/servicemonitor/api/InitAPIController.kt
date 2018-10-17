@@ -17,16 +17,12 @@ class InitAPIController(
 
     @GetMapping(INIT_API)
     fun init(httpRequest: HttpServletRequest): InitAPIResponse {
-        if (!checkIfSetupIsDone()) {
-            return InitAPIResponse(status = STATUS_SETUP_REQUIRED)
+        return when {
+            !checkIfSetupIsDone() -> InitAPIResponse(status = STATUS_SETUP_REQUIRED)
+            httpRequest.remoteUser == null -> InitAPIResponse(status = STATUS_AUTH_REQUIRED)
+            else -> InitAPIResponse(status = STATUS_OK)
         }
-        if (httpRequest.remoteUser == null) {
-            return InitAPIResponse(status = STATUS_AUTH_REQUIRED)
-        }
-
-        return InitAPIResponse(status = STATUS_OK)
     }
 
     fun checkIfSetupIsDone() = userRepository.count() > 0
-
 }

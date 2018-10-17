@@ -74,5 +74,4 @@ class InitAPITests {
             .andExpect(jsonPath("$.status", equalTo("ok")))
             .andDo { userRepository.delete(user) }
     }
-
 }
