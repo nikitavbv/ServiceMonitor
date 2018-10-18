@@ -5,3 +5,4 @@ data
 data-dev
 gradle
 out
+frontend/node_modules
