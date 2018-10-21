@@ -8,8 +8,6 @@ services:
       - MYSQL_ROOT_PASSWORD=rootpassw
       - MYSQL_USER=devuser
       - MYSQL_PASSWORD=devpassword
-    ports:
-      - "3306:3306"
     volumes:
       - "./data-dev/db/mysql:/var/lib/mysql"
   dbadmin:
@@ -22,3 +20,27 @@ services:
       - PMA_HOST=servicemonitor_mysql
     depends_on:
       - database
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend.dev
+    container_name: servicemonitor_frontend
+    volumes:
+      - "./frontend:/app"
+  app:
+    build: .
+    environment:
+      - DB_URL=jdbc:mysql://servicemonitor_mysql:3306/servicemonitor
+      - DB_USERNAME=devuser
+      - DB_PASSWORD=devpassword
+    depends_on:
+      - database
+  nginx:
+    build:
+      context: .
+      dockerfile: Dockerfile.nginx.dev
+    ports:
+      - "8080:80"
+    depends_on:
+      - frontend
+      - app
