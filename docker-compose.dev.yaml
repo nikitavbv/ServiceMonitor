@@ -8,6 +8,8 @@ services:
       - MYSQL_ROOT_PASSWORD=rootpassw
       - MYSQL_USER=devuser
       - MYSQL_PASSWORD=devpassword
+    ports:
+      - "3306:3306"
     volumes:
       - "./data-dev/db/mysql:/var/lib/mysql"
   dbadmin:
