@@ -29,3 +29,4 @@
 data
 data-dev
 src/main/resources/application.properties
+src/main/resources/static
