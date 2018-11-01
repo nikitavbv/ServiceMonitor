@@ -31,5 +31,4 @@ class FrontendTests {
         assertNotNull(result)
         assertTrue(result.body!!.contains("<app-root></app-root>"))
     }
-
 }
