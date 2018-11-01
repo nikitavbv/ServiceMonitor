@@ -1,7 +1,7 @@
 package com.github.nikitavbv.servicemonitor
 
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertTrue
+import junit.framework.TestCase.assertTrue
+import junit.framework.TestCase.assertNotNull
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
