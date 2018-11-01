@@ -11,6 +11,7 @@ before_install:
 
 script:
   - ./ktlint "src/**/*.kt"
+  - cd frontend && npm run build && cd .. && cp frontend/dist/ServiceMonitorFrontend src/main/resources/static -r
   - ./gradlew detekt test build --scan
 
 after_success:
