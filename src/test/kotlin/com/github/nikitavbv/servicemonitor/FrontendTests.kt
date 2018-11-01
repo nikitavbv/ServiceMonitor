@@ -22,13 +22,15 @@ class FrontendTests {
     fun `test frontend index endpoint`() {
         val result = testRestTemplate.exchange("/", HttpMethod.GET, HttpEntity.EMPTY, String::class.java)
         assertNotNull(result)
+        println(result.body)
         assertTrue(result.body!!.contains("<app-root></app-root>"))
     }
 
     @Test
-    fun `test frontend other enpoints`() {
+    fun `test frontend other endpoints`() {
         val result = testRestTemplate.exchange("/auth", HttpMethod.GET, HttpEntity.EMPTY, String::class.java)
         assertNotNull(result)
+        println(result.body)
         assertTrue(result.body!!.contains("<app-root></app-root>"))
     }
 }
