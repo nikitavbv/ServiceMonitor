@@ -38,8 +38,17 @@ class JWTAuthorizationFilter(
     private fun getAuthentication(request: HttpServletRequest): Authentication? {
         val token = request.getHeader(HEADER_STRING)
         if (token != null) {
+            var secret: String
+            try {
+                secret = securityProperties.secret
+            } catch (e: UninitializedPropertyAccessException) {
+                securityProperties.secret = securityProperties.generateSecret()
+                println("Security secret is generated")
+                secret = securityProperties.secret
+            }
+
             val user = Jwts.parser()
-                    .setSigningKey(securityProperties.secret)
+                    .setSigningKey(secret)
                     .parseClaimsJws(token.replace(TOKEN_PREFIX, ""))
                     .body
                     .subject

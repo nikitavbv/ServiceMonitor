@@ -53,7 +53,16 @@ class JWTAuthenticationFilter(
         chain: FilterChain?,
         auth: Authentication
     ) {
-        val keyBytes = Decoders.BASE64.decode(securityProperties.secret)
+        var secret: String
+        try {
+            secret = securityProperties.secret
+        } catch (e: UninitializedPropertyAccessException) {
+            securityProperties.secret = securityProperties.generateSecret()
+            println("Security secret is generated")
+            secret = securityProperties.secret
+        }
+
+        val keyBytes = Decoders.BASE64.decode(secret)
         val key = Keys.hmacShaKeyFor(keyBytes)
 
         val jwt = Jwts.builder()
