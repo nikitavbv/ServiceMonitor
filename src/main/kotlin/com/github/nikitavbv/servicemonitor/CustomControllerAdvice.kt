@@ -2,6 +2,7 @@ package com.github.nikitavbv.servicemonitor
 
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import com.github.nikitavbv.servicemonitor.agent.AgentNotFoundException
+import com.github.nikitavbv.servicemonitor.exceptions.AuthRequiredException
 import com.github.nikitavbv.servicemonitor.exceptions.InvalidParameterValueException
 import com.github.nikitavbv.servicemonitor.exceptions.MissingAPIKeyException
 import com.github.nikitavbv.servicemonitor.exceptions.MissingParameterException
@@ -14,6 +15,15 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 
 @ControllerAdvice
 class CustomControllerAdvice {
+
+    @ExceptionHandler(AuthRequiredException::class)
+    fun handleAuthRequiredException(
+        exception: AuthRequiredException
+    ): ResponseEntity<Map<String, Any>> {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(mapOf(
+            "error" to "auth_required"
+        ))
+    }
 
     @ExceptionHandler(HttpMessageNotReadableException::class)
     fun handleHttpMessageNotReadableException(

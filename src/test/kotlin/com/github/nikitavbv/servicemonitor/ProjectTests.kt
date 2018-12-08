@@ -73,6 +73,7 @@ class ProjectTests {
                         projectInfo.id ?: throw AssertionError("No id set for project")
                     )
                     assertNotNull(project.apiKey)
+                    projectRepository.delete(project)
                 }
             }
     }
