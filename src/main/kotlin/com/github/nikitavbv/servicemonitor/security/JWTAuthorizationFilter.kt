@@ -8,6 +8,7 @@ import org.springframework.security.core.Authentication
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter
+import java.security.SignatureException
 import javax.servlet.FilterChain
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
@@ -47,13 +48,18 @@ class JWTAuthorizationFilter(
                 secret = securityProperties.secret
             }
 
-            val user = Jwts.parser()
+            try {
+                val user = Jwts.parser()
                     .setSigningKey(secret)
                     .parseClaimsJws(token.replace(TOKEN_PREFIX, ""))
                     .body
                     .subject
-            if (user != null) {
-                return UsernamePasswordAuthenticationToken(user, null, emptyList<GrantedAuthority>())
+
+                if (user != null) {
+                    return UsernamePasswordAuthenticationToken(user, null, emptyList<GrantedAuthority>())
+                }
+            } catch (e: SignatureException) {
+                return null
             }
         }
         return null
