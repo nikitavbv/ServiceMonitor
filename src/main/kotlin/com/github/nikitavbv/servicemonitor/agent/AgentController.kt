@@ -1,10 +1,13 @@
 package com.github.nikitavbv.servicemonitor.agent
 
 import com.github.nikitavbv.servicemonitor.AGENT_API
+import com.github.nikitavbv.servicemonitor.api.StatusOKResponse
 import com.github.nikitavbv.servicemonitor.exceptions.MissingParameterException
+import com.github.nikitavbv.servicemonitor.exceptions.UnknownParameterException
 import com.github.nikitavbv.servicemonitor.project.ProjectNotFoundException
 import com.github.nikitavbv.servicemonitor.project.ProjectRepository
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -25,5 +28,27 @@ class AgentController(
         project.agents.add(agent)
         projectRepository.save(project)
         return agent
+    }
+
+    @PutMapping
+    fun updateAgent(@RequestBody updates: Map<String, Any>): StatusOKResponse {
+        val agentAPIKey = (updates["token"] ?: throw MissingParameterException("token")).toString()
+        val agent = agentRepository.findByApiKey(agentAPIKey) ?: throw AgentNotFoundException()
+        updates.keys.forEach {
+            if (it != "token") {
+                when (it) {
+                    "properties" -> {
+                        val properties = updates["properties"] as Map<*, *>
+                        properties.keys.forEach { propertyName ->
+                            val propertyValue = properties[propertyName].toString()
+                            agent.properties[propertyName.toString()] = propertyValue
+                        }
+                    }
+                    else -> throw UnknownParameterException(it)
+                }
+            }
+        }
+        agentRepository.save(agent)
+        return StatusOKResponse()
     }
 }

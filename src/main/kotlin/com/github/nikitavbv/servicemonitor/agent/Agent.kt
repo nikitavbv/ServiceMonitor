@@ -5,6 +5,7 @@ import com.github.nikitavbv.servicemonitor.metric.Metric
 import java.util.UUID
 import javax.persistence.CascadeType
 import javax.persistence.Column
+import javax.persistence.ElementCollection
 import javax.persistence.Entity
 import javax.persistence.FetchType
 import javax.persistence.GeneratedValue
@@ -25,7 +26,10 @@ data class Agent(
 
     @JsonIgnore
     @OneToMany(cascade = [CascadeType.ALL], fetch = FetchType.LAZY, mappedBy = "agent")
-    val metrics: List<Metric> = mutableListOf()
+    val metrics: List<Metric> = mutableListOf(),
+
+    @ElementCollection
+    val properties: MutableMap<String, String> = mutableMapOf()
 ) {
 
     @PrePersist
