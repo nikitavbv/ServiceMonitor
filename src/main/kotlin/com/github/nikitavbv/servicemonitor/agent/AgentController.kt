@@ -4,15 +4,16 @@ import com.github.nikitavbv.servicemonitor.AGENT_API
 import com.github.nikitavbv.servicemonitor.api.StatusOKResponse
 import com.github.nikitavbv.servicemonitor.exceptions.MissingParameterException
 import com.github.nikitavbv.servicemonitor.exceptions.UnknownParameterException
-import com.github.nikitavbv.servicemonitor.project.Project
 import com.github.nikitavbv.servicemonitor.project.ProjectNotFoundException
 import com.github.nikitavbv.servicemonitor.project.ProjectRepository
 import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import javax.ws.rs.QueryParam
 
 @RestController
 @RequestMapping(AGENT_API)
@@ -20,6 +21,11 @@ class AgentController(
     var agentRepository: AgentRepository,
     var projectRepository: ProjectRepository
 ) {
+
+    @GetMapping()
+    fun getAgentDetails(@QueryParam("token") token: String): Agent {
+        return agentRepository.findByApiKey(token) ?: throw AgentNotFoundException()
+    }
 
     @PostMapping
     fun initAgent(@RequestBody body: Map<String, Any>): Agent {

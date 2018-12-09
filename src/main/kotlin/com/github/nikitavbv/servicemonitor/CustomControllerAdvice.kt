@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
+import java.lang.IllegalArgumentException
 
 @ControllerAdvice
 class CustomControllerAdvice {
@@ -48,6 +49,29 @@ class CustomControllerAdvice {
         return ResponseEntity.badRequest().body(mapOf(
             "error" to "missing_parameter",
             "missing_parameter" to exception.parameterName
+        ))
+    }
+
+    @ExceptionHandler(IllegalArgumentException::class)
+    fun handleIllegalArgumentException(
+        exception: IllegalArgumentException
+    ): ResponseEntity<Map<String, Any?>> {
+        val exceptionMessage = exception.message ?: return ResponseEntity.badRequest().body(mapOf(
+            "error" to "illegal_parameter"
+        ))
+
+        if (exceptionMessage.startsWith("Parameter specified as non-null is null: ")) {
+            val parameterName = exceptionMessage.substring(
+                exceptionMessage.indexOf(", parameter ") + ", parameter ".length
+            )
+            return ResponseEntity.badRequest().body(mapOf(
+                "error" to "missing_parameter",
+                "missing_parameter" to parameterName
+            ))
+        }
+
+        return ResponseEntity.badRequest().body(mapOf(
+            "error" to "illegal_parameter"
         ))
     }
 
