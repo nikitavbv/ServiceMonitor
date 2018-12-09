@@ -4,8 +4,10 @@ import com.github.nikitavbv.servicemonitor.AGENT_API
 import com.github.nikitavbv.servicemonitor.api.StatusOKResponse
 import com.github.nikitavbv.servicemonitor.exceptions.MissingParameterException
 import com.github.nikitavbv.servicemonitor.exceptions.UnknownParameterException
+import com.github.nikitavbv.servicemonitor.project.Project
 import com.github.nikitavbv.servicemonitor.project.ProjectNotFoundException
 import com.github.nikitavbv.servicemonitor.project.ProjectRepository
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -49,6 +51,19 @@ class AgentController(
             }
         }
         agentRepository.save(agent)
+        return StatusOKResponse()
+    }
+
+    @DeleteMapping()
+    fun deleteAgent(@RequestBody body: Map<String, Any>): StatusOKResponse {
+        val agentAPIKey = (body["token"] ?: throw MissingParameterException("token")).toString()
+        val agent = agentRepository.findByApiKey(agentAPIKey) ?: throw AgentNotFoundException()
+        val project = agent.project
+        agentRepository.delete(agent)
+        if (project != null) {
+            project.agents.remove(agent)
+            projectRepository.save(project)
+        }
         return StatusOKResponse()
     }
 }
