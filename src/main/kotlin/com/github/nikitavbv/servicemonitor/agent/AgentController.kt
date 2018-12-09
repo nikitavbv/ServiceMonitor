@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import javax.servlet.http.HttpServletRequest
-import javax.ws.rs.QueryParam
 
 @RestController
 @RequestMapping(AGENT_API)
@@ -30,7 +29,7 @@ class AgentController(
 ) {
 
     @GetMapping()
-    fun getAgentDetails(@QueryParam("token") token: String): Map<String, Any?> {
+    fun getAgentDetails(token: String): Map<String, Any?> {
         val agent = agentRepository.findByApiKey(token) ?: throw AgentNotFoundException()
         return mapOf(
             "id" to agent.id,

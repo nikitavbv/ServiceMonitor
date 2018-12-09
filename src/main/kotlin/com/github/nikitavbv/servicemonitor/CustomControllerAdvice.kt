@@ -7,6 +7,7 @@ import com.github.nikitavbv.servicemonitor.exceptions.InvalidParameterValueExcep
 import com.github.nikitavbv.servicemonitor.exceptions.MissingAPIKeyException
 import com.github.nikitavbv.servicemonitor.exceptions.MissingParameterException
 import com.github.nikitavbv.servicemonitor.exceptions.UnknownParameterException
+import com.github.nikitavbv.servicemonitor.metric.MetricNotFoundException
 import com.github.nikitavbv.servicemonitor.project.ProjectNotFoundException
 import com.github.nikitavbv.servicemonitor.security.PermissionDeniedException
 import org.springframework.http.HttpStatus
@@ -124,4 +125,10 @@ class CustomControllerAdvice {
     fun handleProjectNotFoundException(exception: ProjectNotFoundException): ResponseEntity<Map<String, String?>> {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("error" to "project_not_found"))
     }
+
+    @ExceptionHandler(MetricNotFoundException::class)
+    fun handleMetricNotFoundException(exception: MetricNotFoundException): ResponseEntity<Map<String, String?>> {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("error" to "metric_not_found"))
+    }
+
 }

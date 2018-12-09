@@ -35,7 +35,8 @@ data class MemoryMetric(
             "buffers" to buffers,
             "cached" to cached,
             "swapTotal" to swapTotal,
-            "swapFree" to swapFree
+            "swapFree" to swapFree,
+            "timestamp" to timestamp
         )
     }
 
