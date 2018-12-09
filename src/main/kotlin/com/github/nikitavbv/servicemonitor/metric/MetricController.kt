@@ -5,6 +5,7 @@ import com.github.nikitavbv.servicemonitor.METRIC_API
 import com.github.nikitavbv.servicemonitor.agent.Agent
 import com.github.nikitavbv.servicemonitor.agent.AgentNotFoundException
 import com.github.nikitavbv.servicemonitor.agent.AgentRepository
+import com.github.nikitavbv.servicemonitor.api.StatusOKResponse
 import com.github.nikitavbv.servicemonitor.exceptions.InvalidParameterValueException
 import com.github.nikitavbv.servicemonitor.exceptions.MissingAPIKeyException
 import com.github.nikitavbv.servicemonitor.exceptions.MissingParameterException
@@ -26,8 +27,8 @@ class MetricController(
 ) {
 
     @PostMapping
-    fun addData(req: HttpServletRequest, @RequestBody body: Map<String, Any>) {
-        val agent = findAgentByAPIToken(getRequestAPIToken(req))
+    fun addData(req: HttpServletRequest, @RequestBody body: Map<String, Any>): StatusOKResponse {
+        val agent = findAgentByAPIToken(getRequestAPIToken(body))
         val metrics = getMapList(body, METRICS_BODY_KEY)
 
         val mapper = ObjectMapper()
@@ -51,6 +52,8 @@ class MetricController(
                 else -> throw InvalidParameterValueException(METRICS_BODY_KEY, "unknown metric type: $metricType")
             }
         }
+
+        return StatusOKResponse()
     }
 
     fun addMemoryRecord(metricBase: Metric, metric: MemoryMetric) {
@@ -58,8 +61,8 @@ class MetricController(
         memoryMetricRepository.save(metric)
     }
 
-    fun getRequestAPIToken(req: HttpServletRequest): String {
-        return (req.getHeader(API_KEY_HEADER) ?: throw MissingAPIKeyException()).removePrefix(API_KEY_PREFIX)
+    fun getRequestAPIToken(body: Map<String, Any>): String {
+        return (body["token"] ?: throw MissingAPIKeyException()).toString()
     }
 
     fun findAgentByAPIToken(apiToken: String): Agent {

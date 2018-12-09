@@ -2,6 +2,7 @@ package com.github.nikitavbv.servicemonitor.agent
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.github.nikitavbv.servicemonitor.metric.Metric
+import com.github.nikitavbv.servicemonitor.metric.resources.MemoryMetric
 import com.github.nikitavbv.servicemonitor.project.Project
 import java.util.UUID
 import javax.persistence.CascadeType
@@ -39,12 +40,12 @@ data class Agent(
     @JsonIgnore
     var project: Project? = null,
 
+    @ElementCollection
+    val properties: MutableMap<String, String> = mutableMapOf(),
+
     @JsonIgnore
     @OneToMany(cascade = [CascadeType.ALL], fetch = FetchType.LAZY, mappedBy = "agent")
-    val metrics: List<Metric> = mutableListOf(),
-
-    @ElementCollection
-    val properties: MutableMap<String, String> = mutableMapOf()
+    val metrics: List<Metric> = mutableListOf()
 ) {
 
     @PrePersist
