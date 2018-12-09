@@ -2,6 +2,7 @@ package com.github.nikitavbv.servicemonitor.agent
 
 import com.github.nikitavbv.servicemonitor.AGENT_API
 import com.github.nikitavbv.servicemonitor.exceptions.MissingParameterException
+import com.github.nikitavbv.servicemonitor.project.ProjectNotFoundException
 import com.github.nikitavbv.servicemonitor.project.ProjectRepository
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -16,11 +17,11 @@ class AgentController(
 ) {
 
     @PostMapping
-    fun initAgent(@RequestBody agent: Agent, @RequestBody body: Map<String, Any>): Agent {
-        val projectAPIKey = (body["projectKey"] ?: throw MissingParameterException("projectKey")).toString()
-
+    fun initAgent(@RequestBody body: Map<String, Any>): Agent {
+        val projectAPIKey = (body["token"] ?: throw MissingParameterException("token")).toString()
+        val agent = Agent()
+        val project = projectRepository.findByApiKey(projectAPIKey) ?: throw ProjectNotFoundException()
         agentRepository.save(agent)
-        val project = projectRepository.findByApiKey(projectAPIKey)
         project.agents.add(agent)
         projectRepository.save(project)
         return agent

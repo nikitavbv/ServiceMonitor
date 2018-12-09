@@ -2,6 +2,7 @@ package com.github.nikitavbv.servicemonitor.project
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.nikitavbv.servicemonitor.PROJECT_API
+import com.github.nikitavbv.servicemonitor.agent.Agent
 import com.github.nikitavbv.servicemonitor.api.StatusOKResponse
 import com.github.nikitavbv.servicemonitor.exceptions.AuthRequiredException
 import com.github.nikitavbv.servicemonitor.exceptions.UnknownParameterException
@@ -70,5 +71,14 @@ class ProjectController(
         user.projects.remove(project)
         applicationUserRepository.save(user)
         return StatusOKResponse()
+    }
+
+    @GetMapping("/{projectID}/agents")
+    fun getProjectAgents(httpRequest: HttpServletRequest, @PathVariable projectID: Long): Map<String, Any> {
+        val user = applicationUserRepository.findByUsername(httpRequest.remoteUser)
+        val project = user.projects.find { it.id == projectID } ?: throw ProjectNotFoundException()
+        return mapOf(
+            "agents" to project.agents
+        )
     }
 }

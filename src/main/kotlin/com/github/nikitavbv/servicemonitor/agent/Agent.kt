@@ -21,7 +21,6 @@ data class Agent(
     @Column(name = "agent_id")
     var id: Long? = null,
 
-    var description: String? = null,
     var apiKey: String? = null,
 
     @JsonIgnore
