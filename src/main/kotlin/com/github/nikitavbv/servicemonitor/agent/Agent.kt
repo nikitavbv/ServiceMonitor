@@ -26,6 +26,8 @@ data class Agent(
     @Column(name = "agent_id")
     var id: Long? = null,
 
+    var name: String? = null,
+
     var apiKey: String? = null,
 
     @ManyToOne

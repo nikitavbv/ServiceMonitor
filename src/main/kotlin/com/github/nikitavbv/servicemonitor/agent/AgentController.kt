@@ -31,6 +31,9 @@ class AgentController(
     fun initAgent(@RequestBody body: Map<String, Any>): Agent {
         val projectAPIKey = (body["token"] ?: throw MissingParameterException("token")).toString()
         val agent = Agent()
+        if (body.containsKey("name")) {
+            agent.name = body["name"].toString()
+        }
         val project = projectRepository.findByApiKey(projectAPIKey) ?: throw ProjectNotFoundException()
         agentRepository.save(agent)
         project.agents.add(agent)
@@ -45,6 +48,7 @@ class AgentController(
         updates.keys.forEach {
             if (it != "token") {
                 when (it) {
+                    "name" -> agent.name = updates[it].toString()
                     "properties" -> {
                         val properties = updates["properties"] as Map<*, *>
                         properties.keys.forEach { propertyName ->
