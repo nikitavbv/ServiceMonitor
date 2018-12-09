@@ -15,10 +15,10 @@ data class Metric(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
 
-    var lastEntryID: Long? = null,
-
     var tag: String? = null,
     var type: String? = null,
+
+    var lastEntryID: Long? = null,
 
     @ManyToOne(cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     @JoinColumn(name = "agent_id")

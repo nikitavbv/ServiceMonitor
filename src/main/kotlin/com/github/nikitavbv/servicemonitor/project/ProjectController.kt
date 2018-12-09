@@ -5,6 +5,7 @@ import com.github.nikitavbv.servicemonitor.PROJECT_API
 import com.github.nikitavbv.servicemonitor.agent.Agent
 import com.github.nikitavbv.servicemonitor.api.StatusOKResponse
 import com.github.nikitavbv.servicemonitor.exceptions.AuthRequiredException
+import com.github.nikitavbv.servicemonitor.exceptions.MissingParameterException
 import com.github.nikitavbv.servicemonitor.exceptions.UnknownParameterException
 import com.github.nikitavbv.servicemonitor.metric.resources.MemoryMetricRepository
 import com.github.nikitavbv.servicemonitor.user.ApplicationUserRepository
@@ -22,6 +23,7 @@ import java.io.BufferedReader
 import java.io.Reader
 import java.security.InvalidParameterException
 import javax.servlet.http.HttpServletRequest
+import javax.ws.rs.Path
 
 @RestController
 @RequestMapping(PROJECT_API)
@@ -94,5 +96,27 @@ class ProjectController(
         return mapOf(
             "agents" to agentsList
         )
+    }
+
+    @PutMapping("/{projectID}/starMetric")
+    fun starMetric(httpRequest: HttpServletRequest, @PathVariable projectID: Long, @RequestBody body: Map<String, Any?>): StatusOKResponse {
+        val user = applicationUserRepository.findByUsername(httpRequest.remoteUser)
+        val project = user.projects.find { it.id == projectID } ?: throw ProjectNotFoundException()
+        val metricID = (body["metricID"] ?: throw MissingParameterException("metricID")).toString().toLong()
+        if (!project.starredMetrics.contains(metricID)) {
+            project.starredMetrics.add(metricID)
+        }
+        projectRepository.save(project)
+        return StatusOKResponse()
+    }
+
+    @PutMapping("/{projectID}/unstarMetric")
+    fun unstarMetric(httpRequest: HttpServletRequest, @PathVariable projectID: Long, @RequestBody body: Map<String, Any?>): StatusOKResponse {
+        val user = applicationUserRepository.findByUsername(httpRequest.remoteUser)
+        val project = user.projects.find { it.id == projectID } ?: throw ProjectNotFoundException()
+        val metricID = (body["metricID"] ?: throw MissingParameterException("metricID")).toString().toLong()
+        project.starredMetrics.remove(metricID)
+        projectRepository.save(project)
+        return StatusOKResponse()
     }
 }

@@ -6,6 +6,7 @@ import com.github.nikitavbv.servicemonitor.user.ApplicationUser
 import java.util.UUID
 import javax.persistence.CascadeType
 import javax.persistence.Column
+import javax.persistence.ElementCollection
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
@@ -39,8 +40,10 @@ data class Project(
         inverseJoinColumns = [JoinColumn(name = "agent_id")]
     )
     @JsonIgnore
-    var agents: MutableList<Agent> = mutableListOf()
+    var agents: MutableList<Agent> = mutableListOf(),
 
+    @ElementCollection
+    var starredMetrics: MutableList<Long> = mutableListOf()
 ) {
 
     @PrePersist
