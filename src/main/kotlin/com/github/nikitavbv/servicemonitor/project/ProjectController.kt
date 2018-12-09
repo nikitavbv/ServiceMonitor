@@ -54,6 +54,37 @@ class ProjectController(
         return CreateProjectResult(project.id, project.name)
     }
 
+    @GetMapping("/{projectID}")
+    fun getProject(httpRequest: HttpServletRequest, @PathVariable projectID: Long): Map<String, Any?> {
+        val user = applicationUserRepository.findByUsername(httpRequest.remoteUser)
+        val project = user.projects.find { it.id == projectID } ?: throw ProjectNotFoundException()
+        val metrics: MutableList<Map<String, Any?>> = mutableListOf()
+        val agents: MutableList<Map<String, Any?>> = mutableListOf()
+
+        project.agents.forEach { agent ->
+            agents.add(mapOf(
+                "name" to agent.name,
+                "properties" to agent.properties
+            ))
+
+            val metricsMap = agent.getMetricsAsMap(
+                memoryMetricRepository
+            )
+            metricsMap.values.forEach {
+                val metricMap: MutableMap<String, Any?> = mutableMapOf()
+                metricMap.putAll(it)
+                metricMap["agent"] = agent.id
+                metrics.add(metricMap)
+            }
+        }
+
+        return mapOf(
+            "starredMetrics" to project.starredMetrics,
+            "metrics" to metrics,
+            "agents" to agents
+        )
+    }
+
     @PutMapping("/{projectID}")
     fun updateProject(httpRequest: HttpServletRequest, @PathVariable projectID: Long, @RequestBody updates: Map<String, Any>): StatusOKResponse {
         val user = applicationUserRepository.findByUsername(httpRequest.remoteUser)
