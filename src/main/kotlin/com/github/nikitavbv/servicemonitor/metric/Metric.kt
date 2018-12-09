@@ -15,6 +15,8 @@ data class Metric(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
 
+    var lastEntryID: Long? = null,
+
     var tag: String? = null,
     var type: String? = null,
 

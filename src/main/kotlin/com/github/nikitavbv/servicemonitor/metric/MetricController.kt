@@ -59,6 +59,8 @@ class MetricController(
     fun addMemoryRecord(metricBase: Metric, metric: MemoryMetric) {
         metric.metricBase = metricBase
         memoryMetricRepository.save(metric)
+        metricBase.lastEntryID = metric.id
+        metricRepository.save(metricBase)
     }
 
     fun getRequestAPIToken(body: Map<String, Any>): String {

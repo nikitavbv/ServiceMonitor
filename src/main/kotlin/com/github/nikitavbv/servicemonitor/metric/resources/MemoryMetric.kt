@@ -25,4 +25,18 @@ data class MemoryMetric(
     val cached: Long,
     val swapTotal: Long,
     val swapFree: Long
-)
+) {
+
+    fun asMap(): Map<String, Any?> {
+        return mapOf(
+            "total" to total,
+            "free" to free,
+            "available" to available,
+            "buffers" to buffers,
+            "cached" to cached,
+            "swapTotal" to swapTotal,
+            "swapFree" to swapFree
+        )
+    }
+
+}

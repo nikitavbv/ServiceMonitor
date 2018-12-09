@@ -6,6 +6,7 @@ import com.github.nikitavbv.servicemonitor.agent.Agent
 import com.github.nikitavbv.servicemonitor.api.StatusOKResponse
 import com.github.nikitavbv.servicemonitor.exceptions.AuthRequiredException
 import com.github.nikitavbv.servicemonitor.exceptions.UnknownParameterException
+import com.github.nikitavbv.servicemonitor.metric.resources.MemoryMetricRepository
 import com.github.nikitavbv.servicemonitor.user.ApplicationUserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
@@ -25,7 +26,9 @@ import javax.servlet.http.HttpServletRequest
 @RestController
 @RequestMapping(PROJECT_API)
 class ProjectController(
-    val projectRepository: ProjectRepository
+    val projectRepository: ProjectRepository,
+
+    val memoryMetricRepository: MemoryMetricRepository
 ) {
 
     @Autowired
@@ -77,8 +80,19 @@ class ProjectController(
     fun getProjectAgents(httpRequest: HttpServletRequest, @PathVariable projectID: Long): Map<String, Any> {
         val user = applicationUserRepository.findByUsername(httpRequest.remoteUser)
         val project = user.projects.find { it.id == projectID } ?: throw ProjectNotFoundException()
+        val agentsList: MutableList<Map<String, Any?>> = mutableListOf()
+        project.agents.forEach { agent ->
+            agentsList.add(mapOf(
+                "id" to agent.id,
+                "name" to agent.name,
+                "properties" to agent.properties,
+                "metrics" to agent.getMetricsAsMap(
+                    memoryMetricRepository
+                )
+            ))
+        }
         return mapOf(
-            "agents" to project.agents
+            "agents" to agentsList
         )
     }
 }

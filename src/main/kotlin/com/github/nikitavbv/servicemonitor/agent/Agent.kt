@@ -3,7 +3,9 @@ package com.github.nikitavbv.servicemonitor.agent
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.github.nikitavbv.servicemonitor.metric.Metric
 import com.github.nikitavbv.servicemonitor.metric.resources.MemoryMetric
+import com.github.nikitavbv.servicemonitor.metric.resources.MemoryMetricRepository
 import com.github.nikitavbv.servicemonitor.project.Project
+import org.springframework.beans.factory.annotation.Autowired
 import java.util.UUID
 import javax.persistence.CascadeType
 import javax.persistence.Column
@@ -51,5 +53,26 @@ data class Agent(
     @PrePersist
     private fun generateAPIKey() {
         this.apiKey = UUID.randomUUID().toString()
+    }
+
+    fun getMetricsAsMap(
+        memoryMetricRepository: MemoryMetricRepository
+    ): MutableMap<String, Map<String, Any?>> {
+        val metricsData: MutableMap<String, Map<String, Any?>> = mutableMapOf()
+        metrics.forEach {
+            val tag = it.tag
+            val lastEntryId = it.lastEntryID
+            if (tag != null && lastEntryId != null) {
+                when (it.type) {
+                    "memory" -> {
+                        val memoryMetric = memoryMetricRepository.findById(lastEntryId)
+                        if (memoryMetric.isPresent) {
+                            metricsData[tag] = memoryMetric.get().asMap()
+                        }
+                    }
+                }
+            }
+        }
+        return metricsData
     }
 }
