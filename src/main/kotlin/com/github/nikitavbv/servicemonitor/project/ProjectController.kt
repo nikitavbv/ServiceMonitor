@@ -8,6 +8,7 @@ import com.github.nikitavbv.servicemonitor.exceptions.AuthRequiredException
 import com.github.nikitavbv.servicemonitor.exceptions.MissingParameterException
 import com.github.nikitavbv.servicemonitor.exceptions.UnknownParameterException
 import com.github.nikitavbv.servicemonitor.metric.resources.MemoryMetricRepository
+import com.github.nikitavbv.servicemonitor.search.SearchEngine
 import com.github.nikitavbv.servicemonitor.user.ApplicationUserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
@@ -149,5 +150,14 @@ class ProjectController(
         project.starredMetrics.remove(metricID)
         projectRepository.save(project)
         return StatusOKResponse()
+    }
+
+    @GetMapping("/{projectID}/search")
+    fun doSearch(httpRequest: HttpServletRequest, @PathVariable projectID: Long, q: String): Map<String, Any?> {
+        val user = applicationUserRepository.findByUsername(httpRequest.remoteUser)
+        val searchEngine = SearchEngine(user.projects)
+        return mapOf(
+            "results" to searchEngine.doSearchFor(q)
+        )
     }
 }
