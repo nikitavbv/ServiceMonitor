@@ -6,6 +6,8 @@ import com.github.nikitavbv.servicemonitor.exceptions.AuthRequiredException
 import com.github.nikitavbv.servicemonitor.exceptions.InvalidParameterValueException
 import com.github.nikitavbv.servicemonitor.exceptions.MissingAPIKeyException
 import com.github.nikitavbv.servicemonitor.exceptions.MissingParameterException
+import com.github.nikitavbv.servicemonitor.exceptions.UnknownParameterException
+import com.github.nikitavbv.servicemonitor.project.ProjectNotFoundException
 import com.github.nikitavbv.servicemonitor.security.PermissionDeniedException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -56,6 +58,16 @@ class CustomControllerAdvice {
         ))
     }
 
+    @ExceptionHandler(UnknownParameterException::class)
+    fun handleUnknownParameterException(
+        exception: UnknownParameterException
+    ): ResponseEntity<Map<String, String?>> {
+        return ResponseEntity.badRequest().body(mapOf(
+            "error" to "unknown_parameter",
+            "parameterName" to exception.parameterName
+        ))
+    }
+
     @ExceptionHandler(InvalidParameterValueException::class)
     fun handleInvalidParameterValueException(
         exception: InvalidParameterValueException
@@ -82,5 +94,10 @@ class CustomControllerAdvice {
     @ExceptionHandler(AgentNotFoundException::class)
     fun handleAgentNotFoundException(exception: AgentNotFoundException): ResponseEntity<Map<String, String?>> {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("error" to "agent_not_found"))
+    }
+
+    @ExceptionHandler(ProjectNotFoundException::class)
+    fun handleProjectNotFoundException(exception: ProjectNotFoundException): ResponseEntity<Map<String, String?>> {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("error" to "project_not_found"))
     }
 }

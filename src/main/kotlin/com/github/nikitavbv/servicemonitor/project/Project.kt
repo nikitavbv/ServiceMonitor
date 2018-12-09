@@ -1,5 +1,6 @@
 package com.github.nikitavbv.servicemonitor.project
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.github.nikitavbv.servicemonitor.agent.Agent
 import com.github.nikitavbv.servicemonitor.user.ApplicationUser
 import java.util.UUID
@@ -28,7 +29,8 @@ data class Project(
     var apiKey: String? = null,
 
     @ManyToMany(mappedBy="projects")
-    var users: List<ApplicationUser> = mutableListOf(),
+    @JsonIgnore
+    var users: MutableList<ApplicationUser> = mutableListOf(),
 
     @OneToMany
     @JoinTable(
@@ -36,6 +38,7 @@ data class Project(
         joinColumns = [JoinColumn(name = "project_id")],
         inverseJoinColumns = [JoinColumn(name = "agent_id")]
     )
+    @JsonIgnore
     var agents: MutableList<Agent> = mutableListOf()
 
 ) {

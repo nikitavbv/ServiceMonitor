@@ -21,7 +21,7 @@ class AgentController(
 
         agentRepository.save(agent)
         val project = projectRepository.findByApiKey(projectAPIKey)
-        // project.agents.add(agent)
+        project.agents.add(agent)
         projectRepository.save(project)
         return agent
     }

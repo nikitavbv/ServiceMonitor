@@ -33,5 +33,5 @@ data class ApplicationUser(
         name="user_project",
         joinColumns = [JoinColumn(name = "user_id")],
         inverseJoinColumns = [JoinColumn(name = "project_id")])
-    var projects: List<Project> = mutableListOf()
+    var projects: MutableList<Project> = mutableListOf()
 )
