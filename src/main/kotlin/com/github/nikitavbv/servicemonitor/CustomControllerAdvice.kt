@@ -10,6 +10,7 @@ import com.github.nikitavbv.servicemonitor.exceptions.UnknownParameterException
 import com.github.nikitavbv.servicemonitor.metric.MetricNotFoundException
 import com.github.nikitavbv.servicemonitor.project.ProjectNotFoundException
 import com.github.nikitavbv.servicemonitor.security.PermissionDeniedException
+import io.jsonwebtoken.security.SignatureException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.HttpMessageNotReadableException
@@ -131,4 +132,8 @@ class CustomControllerAdvice {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("error" to "metric_not_found"))
     }
 
+    @ExceptionHandler(SignatureException::class)
+    fun handleSignatureException(exception: SignatureException): ResponseEntity<Map<String, String?>> {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("error" to "auth_failed"))
+    }
 }

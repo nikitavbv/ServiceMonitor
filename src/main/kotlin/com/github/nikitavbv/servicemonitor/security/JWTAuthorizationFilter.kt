@@ -2,13 +2,13 @@ package com.github.nikitavbv.servicemonitor.security
 
 import com.github.nikitavbv.servicemonitor.SecurityProperties
 import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.security.SignatureException
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter
-import java.security.SignatureException
 import javax.servlet.FilterChain
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse

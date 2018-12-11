@@ -74,7 +74,7 @@ class AgentTests {
                     project.id ?: throw AssertionError("Project id is not set")
                 )
                 assertEquals(1, projectAfterUpdate.agents.size)
-                assertEquals("Ubuntu 18.04.1 LTS", projectAfterUpdate.agents[0].description)
+                assertEquals("Ubuntu 18.04.1 LTS", projectAfterUpdate.agents[0].name)
                 assertNotNull(projectAfterUpdate.agents[0].apiKey)
                 assertEquals(agentsBeforeTest + 1, agentRepository.count())
                 assertNotNull(agentRepository.findByApiKey(
