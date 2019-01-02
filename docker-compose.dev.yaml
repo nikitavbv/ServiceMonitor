@@ -30,7 +30,9 @@ services:
     volumes:
       - "./frontend:/app"
   app:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
     environment:
       - DB_URL=jdbc:mysql://servicemonitor_mysql:3306/servicemonitor
       - DB_USERNAME=devuser
