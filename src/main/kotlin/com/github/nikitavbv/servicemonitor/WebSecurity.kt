@@ -29,7 +29,7 @@ class WebSecurity(
         http.csrf().disable().authorizeRequests()
                 .antMatchers(HttpMethod.POST, LOGIN_API).permitAll()
                 .antMatchers(HttpMethod.POST, USER_API).permitAll()
-                .antMatchers(HttpMethod.POST, AGENT_API).permitAll()
+                .antMatchers(AGENT_API).permitAll()
                 .antMatchers(HttpMethod.POST, METRIC_API).permitAll()
                 .antMatchers(HttpMethod.GET, INIT_API).permitAll()
                 .antMatchers(API_PATH_PATTERN).authenticated()
