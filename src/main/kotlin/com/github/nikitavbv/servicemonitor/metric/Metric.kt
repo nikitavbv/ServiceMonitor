@@ -3,6 +3,7 @@ package com.github.nikitavbv.servicemonitor.metric
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.github.nikitavbv.servicemonitor.agent.Agent
 import com.github.nikitavbv.servicemonitor.alert.Alert
+import com.github.nikitavbv.servicemonitor.alert.AlertRepository
 import javax.persistence.CascadeType
 import javax.persistence.Entity
 import javax.persistence.FetchType
@@ -30,4 +31,11 @@ data class Metric(
     @JsonIgnore
     @OneToMany(cascade = [CascadeType.ALL], fetch = FetchType.LAZY, mappedBy = "metric")
     val alerts: List<Alert> = mutableListOf()
-)
+) {
+
+
+    fun runAlertChecks(metricData: MutableMap<*, *>, alertRepository: AlertRepository) {
+        alerts.forEach { it.runCheck(metricData, alertRepository) }
+    }
+
+}

@@ -1,3 +1,5 @@
 package com.github.nikitavbv.servicemonitor.alert
 
-interface AlertRepository
+import org.springframework.data.jpa.repository.JpaRepository
+
+interface AlertRepository : JpaRepository<Alert, Long>

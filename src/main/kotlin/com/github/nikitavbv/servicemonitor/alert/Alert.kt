@@ -15,9 +15,36 @@ data class Alert (
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
 
-    var rules: String? = null,
+    var rule: String? = null,
+    var action: String? = null,
+    var triggered: Boolean = false,
 
     @ManyToOne(cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     @JoinColumn(name = "metric_id")
     val metric: Metric? = null
-)
+) {
+
+    fun runCheck(data: MutableMap<*, *>, alertRepository: AlertRepository) {
+        val state = checkIfTrigger(data)
+        if (state == triggered) {
+            return
+        }
+
+        if (state) {
+            runAction()
+        }
+
+        triggered = state
+        alertRepository.save(this)
+    }
+
+    private fun runAction() {
+        // TODO: implement this
+    }
+
+    private fun checkIfTrigger(data: MutableMap<*, *>): Boolean {
+        // TODO: implement check
+        return false
+    }
+
+}

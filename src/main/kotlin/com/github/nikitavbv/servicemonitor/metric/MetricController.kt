@@ -5,6 +5,7 @@ import com.github.nikitavbv.servicemonitor.METRIC_API
 import com.github.nikitavbv.servicemonitor.agent.Agent
 import com.github.nikitavbv.servicemonitor.agent.AgentNotFoundException
 import com.github.nikitavbv.servicemonitor.agent.AgentRepository
+import com.github.nikitavbv.servicemonitor.alert.AlertRepository
 import com.github.nikitavbv.servicemonitor.api.StatusOKResponse
 import com.github.nikitavbv.servicemonitor.exceptions.AccessDeniedException
 import com.github.nikitavbv.servicemonitor.exceptions.AuthRequiredException
@@ -34,7 +35,8 @@ class MetricController(
     var metricRepository: MetricRepository,
     var agentRepository: AgentRepository,
 
-    var memoryMetricRepository: MemoryMetricRepository
+    var memoryMetricRepository: MemoryMetricRepository,
+    var alertRepository: AlertRepository
 ) {
 
     @Autowired
@@ -105,6 +107,8 @@ class MetricController(
                 )
                 else -> throw InvalidParameterValueException(METRICS_BODY_KEY, "unknown metric type: $metricType")
             }
+
+            metric.runAlertChecks(metricData, alertRepository)
         }
 
         return StatusOKResponse()
