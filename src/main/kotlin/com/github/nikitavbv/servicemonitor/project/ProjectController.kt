@@ -52,7 +52,7 @@ class ProjectController(
         projectRepository.save(project)
         user.projects.add(project)
         applicationUserRepository.save(user)
-        return CreateProjectResult(project.id, project.name)
+        return CreateProjectResult(project.id, project.name, user.projects)
     }
 
     @GetMapping("/{projectID}")
@@ -101,13 +101,15 @@ class ProjectController(
     }
 
     @DeleteMapping("/{projectID}")
-    fun deleteProject(httpRequest: HttpServletRequest, @PathVariable projectID: Long): StatusOKResponse {
+    fun deleteProject(httpRequest: HttpServletRequest, @PathVariable projectID: Long): Map<String, Any> {
         val user = applicationUserRepository.findByUsername(httpRequest.remoteUser)
         val project = user.projects.find { it.id == projectID } ?: throw ProjectNotFoundException()
         projectRepository.delete(project)
         user.projects.remove(project)
         applicationUserRepository.save(user)
-        return StatusOKResponse()
+        return mapOf(
+            "projects" to user.projects
+        )
     }
 
     @GetMapping("/{projectID}/agents")

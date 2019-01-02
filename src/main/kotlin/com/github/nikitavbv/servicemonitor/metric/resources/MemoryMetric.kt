@@ -29,6 +29,7 @@ data class MemoryMetric(
 
     fun asMap(): Map<String, Any?> {
         return mapOf(
+            "id" to id,
             "total" to total,
             "free" to free,
             "available" to available,
