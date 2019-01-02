@@ -5,6 +5,7 @@ const val LOGIN_API = "/api/v1/login"
 const val PROJECT_API = "$API_ROOT/project"
 const val AGENT_API = "$API_ROOT/agent"
 const val METRIC_API = "$API_ROOT/metric"
+const val ALERT_API = "$API_ROOT/alert"
 const val INIT_API = "$API_ROOT/init"
 const val USER_API = "$API_ROOT/users"
 
