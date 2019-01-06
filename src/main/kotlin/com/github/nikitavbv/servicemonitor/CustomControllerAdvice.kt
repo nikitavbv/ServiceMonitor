@@ -34,7 +34,7 @@ class CustomControllerAdvice {
     fun handleHttpMessageNotReadableException(
         exception: HttpMessageNotReadableException
     ): ResponseEntity<Map<String, Any>> {
-        if (exception.cause!!::class == MissingKotlinParameterException::class) {
+        if (exception.cause != null && exception.cause!!::class == MissingKotlinParameterException::class) {
             val missingParameterName = (exception.cause as MissingKotlinParameterException).parameter.name!!
             return ResponseEntity.badRequest().body(mapOf(
                     "error" to "missing_parameter",

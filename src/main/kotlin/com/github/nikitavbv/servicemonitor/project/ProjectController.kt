@@ -1,6 +1,5 @@
 package com.github.nikitavbv.servicemonitor.project
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.nikitavbv.servicemonitor.PROJECT_API
 import com.github.nikitavbv.servicemonitor.api.StatusOKResponse
 import com.github.nikitavbv.servicemonitor.exceptions.MissingParameterException

@@ -7,14 +7,12 @@ import com.github.nikitavbv.servicemonitor.metric.resources.CPUMetricRepository
 import com.github.nikitavbv.servicemonitor.metric.resources.DiskUsageMetricRepository
 import com.github.nikitavbv.servicemonitor.metric.resources.DockerMetricRepository
 import com.github.nikitavbv.servicemonitor.metric.resources.IOMetricRepository
-import com.github.nikitavbv.servicemonitor.metric.resources.MemoryMetric
 import com.github.nikitavbv.servicemonitor.metric.resources.MemoryMetricRepository
 import com.github.nikitavbv.servicemonitor.metric.resources.MysqlMetricRepository
 import com.github.nikitavbv.servicemonitor.metric.resources.NetworkMetricRepository
 import com.github.nikitavbv.servicemonitor.metric.resources.NginxMetricRepository
 import com.github.nikitavbv.servicemonitor.metric.resources.UptimeMetricRepository
 import com.github.nikitavbv.servicemonitor.project.Project
-import org.springframework.beans.factory.annotation.Autowired
 import java.util.UUID
 import javax.persistence.CascadeType
 import javax.persistence.Column
@@ -63,6 +61,36 @@ data class Agent(
     @PrePersist
     private fun generateAPIKey() {
         this.apiKey = UUID.randomUUID().toString()
+    }
+
+    fun toMap(
+        memoryMetricRepository: MemoryMetricRepository,
+        ioMetricRepository: IOMetricRepository,
+        diskUsageMetricRepository: DiskUsageMetricRepository,
+        cpuMetricRepository: CPUMetricRepository,
+        uptimeMetricRepository: UptimeMetricRepository,
+        networkMetricRepository: NetworkMetricRepository,
+        dockerMetricRepository: DockerMetricRepository,
+        nginxMetricRepository: NginxMetricRepository,
+        mysqlMetricRepository: MysqlMetricRepository
+    ): Map<String, Any?> {
+        return mapOf(
+            "id" to id,
+            "type" to type,
+            "name" to name,
+            "properties" to properties,
+            "metrics" to getMetricsAsMap(
+                memoryMetricRepository,
+                ioMetricRepository,
+                diskUsageMetricRepository,
+                cpuMetricRepository,
+                uptimeMetricRepository,
+                networkMetricRepository,
+                dockerMetricRepository,
+                nginxMetricRepository,
+                mysqlMetricRepository
+            )
+        )
     }
 
     fun getMetricsAsMap(

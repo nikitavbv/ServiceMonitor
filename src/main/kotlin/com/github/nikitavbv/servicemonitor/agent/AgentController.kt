@@ -2,6 +2,7 @@ package com.github.nikitavbv.servicemonitor.agent
 
 import com.github.nikitavbv.servicemonitor.AGENT_API
 import com.github.nikitavbv.servicemonitor.api.StatusOKResponse
+import com.github.nikitavbv.servicemonitor.exceptions.AccessDeniedException
 import com.github.nikitavbv.servicemonitor.exceptions.AuthRequiredException
 import com.github.nikitavbv.servicemonitor.exceptions.MissingParameterException
 import com.github.nikitavbv.servicemonitor.exceptions.UnknownParameterException
@@ -17,7 +18,6 @@ import com.github.nikitavbv.servicemonitor.metric.resources.UptimeMetricReposito
 import com.github.nikitavbv.servicemonitor.project.ProjectNotFoundException
 import com.github.nikitavbv.servicemonitor.project.ProjectRepository
 import com.github.nikitavbv.servicemonitor.user.ApplicationUserRepository
-import org.apache.http.client.methods.CloseableHttpResponse
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.impl.client.HttpClients
@@ -25,12 +25,14 @@ import org.springframework.http.HttpStatus
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.lang.Exception
+import java.lang.RuntimeException
 import javax.servlet.http.HttpServletRequest
 
 @RestController
@@ -73,7 +75,7 @@ class AgentController(
                 val httpClient: CloseableHttpClient? = HttpClients.createMinimal()
                 val httpGet = HttpGet(endpoint)
                 val startedAt = System.currentTimeMillis()
-                var totalTime = 0L
+                var totalTime: Long
                 try {
                     val response = httpClient?.execute(httpGet)
                     totalTime = System.currentTimeMillis() - startedAt
@@ -106,23 +108,37 @@ class AgentController(
     }
 
     @GetMapping()
-    fun getAgentDetails(token: String): Map<String, Any?> {
+    fun getAgentDetails(httpRequest: HttpServletRequest, token: String): Map<String, Any?> {
         val agent = agentRepository.findByApiKey(token) ?: throw AgentNotFoundException()
-        return mapOf(
-            "id" to agent.id,
-            "name" to agent.name,
-            "properties" to agent.properties,
-            "metrics" to agent.getMetricsAsMap(
-                memoryMetricRepository,
-                ioMetricRepository,
-                diskUsageMetricRepository,
-                cpuMetricRepository,
-                uptimeMetricRepository,
-                networkMetricRepository,
-                dockerMetricRepository,
-                nginxMetricRepository,
-                mysqlMetricRepository
-            )
+        return agent.toMap(
+            memoryMetricRepository,
+            ioMetricRepository,
+            diskUsageMetricRepository,
+            cpuMetricRepository,
+            uptimeMetricRepository,
+            networkMetricRepository,
+            dockerMetricRepository,
+            nginxMetricRepository,
+            mysqlMetricRepository
+        )
+    }
+
+    @GetMapping("/{agentID}")
+    fun getAgentDetailsByID(req: HttpServletRequest, @PathVariable agentID: Long): Map<String, Any?> {
+        val user = applicationUserRepository.findByUsername(req.remoteUser ?: throw AuthRequiredException())
+        val agent = agentRepository.findById(agentID).orElseThrow { AgentNotFoundException() }
+        val project = agent.project ?: throw RuntimeException("No project set for agent")
+        if (!project.users.contains(user)) throw AccessDeniedException()
+        return agent.toMap(
+            memoryMetricRepository,
+            ioMetricRepository,
+            diskUsageMetricRepository,
+            cpuMetricRepository,
+            uptimeMetricRepository,
+            networkMetricRepository,
+            dockerMetricRepository,
+            nginxMetricRepository,
+            mysqlMetricRepository
         )
     }
 
@@ -133,21 +149,16 @@ class AgentController(
         user.projects.forEach { project ->
             project.agents.forEach { agent ->
                 agents.add(
-                    mapOf(
-                        "id" to agent.id,
-                        "name" to agent.name,
-                        "properties" to agent.properties,
-                        "metrics" to agent.getMetricsAsMap(
-                            memoryMetricRepository,
-                            ioMetricRepository,
-                            diskUsageMetricRepository,
-                            cpuMetricRepository,
-                            uptimeMetricRepository,
-                            networkMetricRepository,
-                            dockerMetricRepository,
-                            nginxMetricRepository,
-                            mysqlMetricRepository
-                        )
+                    agent.toMap(
+                        memoryMetricRepository,
+                        ioMetricRepository,
+                        diskUsageMetricRepository,
+                        cpuMetricRepository,
+                        uptimeMetricRepository,
+                        networkMetricRepository,
+                        dockerMetricRepository,
+                        nginxMetricRepository,
+                        mysqlMetricRepository
                     )
                 )
             }
@@ -200,16 +211,40 @@ class AgentController(
         return StatusOKResponse()
     }
 
-    @DeleteMapping()
-    fun deleteAgent(@RequestBody body: Map<String, Any>): StatusOKResponse {
-        val agentAPIKey = (body["token"] ?: throw MissingParameterException("token")).toString()
-        val agent = agentRepository.findByApiKey(agentAPIKey) ?: throw AgentNotFoundException()
-        val project = agent.project
-        agentRepository.delete(agent)
-        if (project != null) {
-            project.agents.remove(agent)
-            projectRepository.save(project)
+    @PutMapping("/{agentID}")
+    fun updateAgent(req: HttpServletRequest, @RequestBody updates: Map<String, Any>, @PathVariable agentID: Long): StatusOKResponse {
+        val user = applicationUserRepository.findByUsername(req.remoteUser ?: throw AuthRequiredException())
+        val agent = agentRepository.findById(agentID).orElseThrow { AgentNotFoundException() }
+        val project = agent.project ?: throw RuntimeException("No project set for agent")
+        if (!project.users.contains(user)) throw AccessDeniedException()
+        updates.keys.forEach {
+            if (it != "token") {
+                when (it) {
+                    "name" -> agent.name = updates[it].toString()
+                    "properties" -> {
+                        val properties = updates["properties"] as Map<*, *>
+                        properties.keys.forEach { propertyName ->
+                            val propertyValue = properties[propertyName].toString()
+                            agent.properties[propertyName.toString()] = propertyValue
+                        }
+                    }
+                    else -> throw UnknownParameterException(it)
+                }
+            }
         }
+        agentRepository.save(agent)
+        return StatusOKResponse()
+    }
+
+    @DeleteMapping("/{agentID}")
+    fun deleteAgent(req: HttpServletRequest, @PathVariable agentID: Long): StatusOKResponse {
+        val user = applicationUserRepository.findByUsername(req.remoteUser ?: throw AuthRequiredException())
+        val agent = agentRepository.findById(agentID).orElseThrow { AgentNotFoundException() }
+        val project = agent.project ?: throw RuntimeException("No project set for agent")
+        if (!project.users.contains(user)) throw AccessDeniedException()
+        agentRepository.delete(agent)
+        project.agents.remove(agent)
+        projectRepository.save(project)
         return StatusOKResponse()
     }
 }

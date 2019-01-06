@@ -2,7 +2,6 @@ package com.github.nikitavbv.servicemonitor.metric.resources
 
 import com.github.nikitavbv.servicemonitor.metric.Metric
 import com.github.nikitavbv.servicemonitor.metric.MetricType
-import java.sql.Timestamp
 import java.util.Date
 import javax.persistence.Entity
 import javax.persistence.FetchType

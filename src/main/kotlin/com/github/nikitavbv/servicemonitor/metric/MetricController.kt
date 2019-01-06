@@ -101,7 +101,7 @@ class MetricController(
 
         if (result.size > pointsNeeded) {
             val scaleFactor = pointsNeeded.toDouble() / result.size
-            var currentStep: Double = 0.0
+            var currentStep = 0.0
             val newResult: MutableList<Map<String, Any?>> = mutableListOf()
             result.forEach {
                 currentStep += scaleFactor

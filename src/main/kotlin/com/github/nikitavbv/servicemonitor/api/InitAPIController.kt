@@ -44,22 +44,16 @@ class InitAPIController(
                 user.projects.forEach { project ->
                     project.agents.forEach { agent ->
                         agents.add(
-                            mapOf(
-                                "id" to agent.id,
-                                "name" to agent.name,
-                                "type" to agent.type,
-                                "properties" to agent.properties,
-                                "metrics" to agent.getMetricsAsMap(
-                                    memoryMetricRepository,
-                                    ioMetricRepository,
-                                    diskUsageMetricRepository,
-                                    cpuMetricRepository,
-                                    uptimeMetricRepository,
-                                    networkMetricRepository,
-                                    dockerMetricRepository,
-                                    nginxMetricRepository,
-                                    mysqlMetricRepository
-                                )
+                            agent.toMap(
+                                memoryMetricRepository,
+                                ioMetricRepository,
+                                diskUsageMetricRepository,
+                                cpuMetricRepository,
+                                uptimeMetricRepository,
+                                networkMetricRepository,
+                                dockerMetricRepository,
+                                nginxMetricRepository,
+                                mysqlMetricRepository
                             )
                         )
                     }
