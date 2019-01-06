@@ -5,7 +5,13 @@ import com.github.nikitavbv.servicemonitor.api.StatusOKResponse
 import com.github.nikitavbv.servicemonitor.exceptions.AuthRequiredException
 import com.github.nikitavbv.servicemonitor.exceptions.MissingParameterException
 import com.github.nikitavbv.servicemonitor.exceptions.UnknownParameterException
+import com.github.nikitavbv.servicemonitor.metric.resources.CPUMetricRepository
+import com.github.nikitavbv.servicemonitor.metric.resources.DiskUsageMetricRepository
+import com.github.nikitavbv.servicemonitor.metric.resources.DockerMetricRepository
+import com.github.nikitavbv.servicemonitor.metric.resources.IOMetricRepository
 import com.github.nikitavbv.servicemonitor.metric.resources.MemoryMetricRepository
+import com.github.nikitavbv.servicemonitor.metric.resources.NetworkMetricRepository
+import com.github.nikitavbv.servicemonitor.metric.resources.UptimeMetricRepository
 import com.github.nikitavbv.servicemonitor.project.ProjectNotFoundException
 import com.github.nikitavbv.servicemonitor.project.ProjectRepository
 import com.github.nikitavbv.servicemonitor.user.ApplicationUserRepository
@@ -25,7 +31,13 @@ class AgentController(
     var projectRepository: ProjectRepository,
     var applicationUserRepository: ApplicationUserRepository,
 
-    val memoryMetricRepository: MemoryMetricRepository
+    val memoryMetricRepository: MemoryMetricRepository,
+    val ioMetricRepository: IOMetricRepository,
+    val diskUsageMetricRepository: DiskUsageMetricRepository,
+    val cpuMetricRepository: CPUMetricRepository,
+    val uptimeMetricRepository: UptimeMetricRepository,
+    val networkMetricRepository: NetworkMetricRepository,
+    val dockerMetricRepository: DockerMetricRepository
 ) {
 
     @GetMapping()
@@ -36,7 +48,13 @@ class AgentController(
             "name" to agent.name,
             "properties" to agent.properties,
             "metrics" to agent.getMetricsAsMap(
-                memoryMetricRepository
+                memoryMetricRepository,
+                ioMetricRepository,
+                diskUsageMetricRepository,
+                cpuMetricRepository,
+                uptimeMetricRepository,
+                networkMetricRepository,
+                dockerMetricRepository
             )
         )
     }
@@ -53,7 +71,13 @@ class AgentController(
                         "name" to agent.name,
                         "properties" to agent.properties,
                         "metrics" to agent.getMetricsAsMap(
-                            memoryMetricRepository
+                            memoryMetricRepository,
+                            ioMetricRepository,
+                            diskUsageMetricRepository,
+                            cpuMetricRepository,
+                            uptimeMetricRepository,
+                            networkMetricRepository,
+                            dockerMetricRepository
                         )
                     )
                 )

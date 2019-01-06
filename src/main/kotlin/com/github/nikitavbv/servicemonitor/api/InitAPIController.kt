@@ -1,7 +1,13 @@
 package com.github.nikitavbv.servicemonitor.api
 
 import com.github.nikitavbv.servicemonitor.INIT_API
+import com.github.nikitavbv.servicemonitor.metric.resources.CPUMetricRepository
+import com.github.nikitavbv.servicemonitor.metric.resources.DiskUsageMetricRepository
+import com.github.nikitavbv.servicemonitor.metric.resources.DockerMetricRepository
+import com.github.nikitavbv.servicemonitor.metric.resources.IOMetricRepository
 import com.github.nikitavbv.servicemonitor.metric.resources.MemoryMetricRepository
+import com.github.nikitavbv.servicemonitor.metric.resources.NetworkMetricRepository
+import com.github.nikitavbv.servicemonitor.metric.resources.UptimeMetricRepository
 import com.github.nikitavbv.servicemonitor.user.ApplicationUserRepository
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
@@ -14,7 +20,13 @@ const val STATUS_OK: String = "ok"
 @RestController
 class InitAPIController(
     val userRepository: ApplicationUserRepository,
-    val memoryMetricRepository: MemoryMetricRepository
+    val memoryMetricRepository: MemoryMetricRepository,
+    val ioMetricRepository: IOMetricRepository,
+    val diskUsageMetricRepository: DiskUsageMetricRepository,
+    val cpuMetricRepository: CPUMetricRepository,
+    val uptimeMetricRepository: UptimeMetricRepository,
+    val networkMetricRepository: NetworkMetricRepository,
+    val dockerMetricRepository: DockerMetricRepository
 ) {
 
     @GetMapping(INIT_API)
@@ -33,7 +45,13 @@ class InitAPIController(
                                 "name" to agent.name,
                                 "properties" to agent.properties,
                                 "metrics" to agent.getMetricsAsMap(
-                                    memoryMetricRepository
+                                    memoryMetricRepository,
+                                    ioMetricRepository,
+                                    diskUsageMetricRepository,
+                                    cpuMetricRepository,
+                                    uptimeMetricRepository,
+                                    networkMetricRepository,
+                                    dockerMetricRepository
                                 )
                             )
                         )

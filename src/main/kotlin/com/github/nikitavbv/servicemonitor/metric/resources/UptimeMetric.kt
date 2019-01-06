@@ -11,7 +11,7 @@ import javax.persistence.Id
 import javax.persistence.OneToOne
 
 @Entity
-data class MemoryMetric(
+data class UptimeMetric(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
 
@@ -19,26 +19,14 @@ data class MemoryMetric(
     var metricBase: Metric,
     val timestamp: Date,
 
-    val total: Long,
-    val free: Long,
-    val available: Long,
-    val buffers: Long,
-    val cached: Long,
-    val swapTotal: Long,
-    val swapFree: Long
+    val uptime: Double
 ) {
 
     fun asMap(): Map<String, Any?> {
         return mapOf(
-            "type" to MetricType.MEMORY.typeName,
+            "type" to MetricType.UPTIME.typeName,
             "id" to metricBase.id,
-            "total" to total,
-            "free" to free,
-            "available" to available,
-            "buffers" to buffers,
-            "cached" to cached,
-            "swapTotal" to swapTotal,
-            "swapFree" to swapFree,
+            "uptime" to uptime,
             "timestamp" to timestamp
         )
     }

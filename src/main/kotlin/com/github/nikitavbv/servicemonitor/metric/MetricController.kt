@@ -12,8 +12,26 @@ import com.github.nikitavbv.servicemonitor.exceptions.AuthRequiredException
 import com.github.nikitavbv.servicemonitor.exceptions.InvalidParameterValueException
 import com.github.nikitavbv.servicemonitor.exceptions.MissingAPIKeyException
 import com.github.nikitavbv.servicemonitor.exceptions.MissingParameterException
+import com.github.nikitavbv.servicemonitor.metric.resources.CPUMetric
+import com.github.nikitavbv.servicemonitor.metric.resources.CPUMetricRepository
+import com.github.nikitavbv.servicemonitor.metric.resources.CPUUsageRepository
+import com.github.nikitavbv.servicemonitor.metric.resources.DeviceIO
+import com.github.nikitavbv.servicemonitor.metric.resources.DeviceIORepository
+import com.github.nikitavbv.servicemonitor.metric.resources.DiskUsageMetric
+import com.github.nikitavbv.servicemonitor.metric.resources.DiskUsageMetricRepository
+import com.github.nikitavbv.servicemonitor.metric.resources.DockerContainerDataRepository
+import com.github.nikitavbv.servicemonitor.metric.resources.DockerMetric
+import com.github.nikitavbv.servicemonitor.metric.resources.DockerMetricRepository
+import com.github.nikitavbv.servicemonitor.metric.resources.FilesystemUsageRepository
+import com.github.nikitavbv.servicemonitor.metric.resources.IOMetric
+import com.github.nikitavbv.servicemonitor.metric.resources.IOMetricRepository
 import com.github.nikitavbv.servicemonitor.metric.resources.MemoryMetric
 import com.github.nikitavbv.servicemonitor.metric.resources.MemoryMetricRepository
+import com.github.nikitavbv.servicemonitor.metric.resources.NetworkDeviceDataRepository
+import com.github.nikitavbv.servicemonitor.metric.resources.NetworkMetric
+import com.github.nikitavbv.servicemonitor.metric.resources.NetworkMetricRepository
+import com.github.nikitavbv.servicemonitor.metric.resources.UptimeMetric
+import com.github.nikitavbv.servicemonitor.metric.resources.UptimeMetricRepository
 import com.github.nikitavbv.servicemonitor.user.ApplicationUserRepository
 import org.hibernate.SessionFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -36,6 +54,18 @@ class MetricController(
     var agentRepository: AgentRepository,
 
     var memoryMetricRepository: MemoryMetricRepository,
+    var ioMetricRepository: IOMetricRepository,
+    var deviceIORepository: DeviceIORepository,
+    var diskUsageMetricRepository: DiskUsageMetricRepository,
+    var filesystemUsageRepository: FilesystemUsageRepository,
+    var cpuMetricRepository: CPUMetricRepository,
+    var cpuUsageRepository: CPUUsageRepository,
+    var uptimeMetricRepository: UptimeMetricRepository,
+    var networkMetricRepository: NetworkMetricRepository,
+    var networkDeviceDataRepository: NetworkDeviceDataRepository,
+    var dockerMetricRepository: DockerMetricRepository,
+    var dockerContainerDataRepository: DockerContainerDataRepository,
+
     var alertRepository: AlertRepository
 ) {
 
@@ -53,7 +83,7 @@ class MetricController(
         var result: MutableList<Map<String, Any?>>
         val pointsNeeded = points ?: DEFAULT_METRICS_POINTS
         when(metric.type) {
-            "memory" -> {
+            MetricType.MEMORY.typeName -> {
                 val query = sessionFactory.openSession().createQuery("from MemoryMetric m WHERE m.metricBase.id = :id AND m.timestamp BETWEEN :fromDate AND :toDate")
                 query.setParameter("id", metric.id)
                 query.setParameter("fromDate", Date(from))
@@ -105,6 +135,30 @@ class MetricController(
                     metric,
                     mapper.convertValue(metricData, MemoryMetric::class.java)
                 )
+                MetricType.IO.typeName -> addIORecord(
+                    metric,
+                    mapper.convertValue(metricData, IOMetric::class.java)
+                )
+                MetricType.DISK_USAGE.typeName -> addDiskUsageRecord(
+                    metric,
+                    mapper.convertValue(metricData, DiskUsageMetric::class.java)
+                )
+                MetricType.CPU.typeName -> addCPURecord(
+                    metric,
+                    mapper.convertValue(metricData, CPUMetric::class.java)
+                )
+                MetricType.UPTIME.typeName -> addUptimeRecord(
+                    metric,
+                    mapper.convertValue(metricData, UptimeMetric::class.java)
+                )
+                MetricType.NETWORK.typeName -> addNetworkRecord(
+                    metric,
+                    mapper.convertValue(metricData, NetworkMetric::class.java)
+                )
+                MetricType.DOCKER.typeName -> addDockerRecord(
+                    metric,
+                    mapper.convertValue(metricData, DockerMetric::class.java)
+                )
                 else -> throw InvalidParameterValueException(METRICS_BODY_KEY, "unknown metric type: $metricType")
             }
 
@@ -117,6 +171,53 @@ class MetricController(
     fun addMemoryRecord(metricBase: Metric, metric: MemoryMetric) {
         metric.metricBase = metricBase
         memoryMetricRepository.save(metric)
+        metricBase.lastEntryID = metric.id
+        metricRepository.save(metricBase)
+    }
+
+    fun addIORecord(metricBase: Metric, metric: IOMetric) {
+        metric.metricBase = metricBase
+        ioMetricRepository.save(metric)
+        metric.devices.forEach { it.metric = metric; deviceIORepository.save(it) }
+        metricBase.lastEntryID = metric.id
+        metricRepository.save(metricBase)
+    }
+
+    fun addDiskUsageRecord(metricBase: Metric, metric: DiskUsageMetric) {
+        metric.metricBase = metricBase
+        diskUsageMetricRepository.save(metric)
+        metric.filesystems.forEach { it.metric = metric; filesystemUsageRepository.save(it) }
+        metricBase.lastEntryID = metric.id
+        metricRepository.save(metricBase)
+    }
+
+    fun addCPURecord(metricBase: Metric, metric: CPUMetric) {
+        metric.metricBase = metricBase
+        cpuMetricRepository.save(metric)
+        metric.cpus.forEach { it.metric = metric; cpuUsageRepository.save(it) }
+        metricBase.lastEntryID = metric.id
+        metricRepository.save(metricBase)
+    }
+
+    fun addUptimeRecord(metricBase: Metric, metric: UptimeMetric) {
+        metric.metricBase = metricBase
+        uptimeMetricRepository.save(metric)
+        metricBase.lastEntryID = metric.id
+        metricRepository.save(metricBase)
+    }
+
+    fun addNetworkRecord(metricBase: Metric, metric: NetworkMetric) {
+        metric.metricBase = metricBase
+        networkMetricRepository.save(metric)
+        metric.devices.forEach { it.metric = metric; networkDeviceDataRepository.save(it) }
+        metricBase.lastEntryID = metric.id
+        metricRepository.save(metricBase)
+    }
+
+    fun addDockerRecord(metricBase: Metric, metric: DockerMetric) {
+        metric.metricBase = metricBase
+        dockerMetricRepository.save(metric)
+        metric.containers.forEach { it.metric = metric; dockerContainerDataRepository.save(it) }
         metricBase.lastEntryID = metric.id
         metricRepository.save(metricBase)
     }

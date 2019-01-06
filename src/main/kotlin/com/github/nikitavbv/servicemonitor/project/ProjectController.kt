@@ -7,7 +7,13 @@ import com.github.nikitavbv.servicemonitor.api.StatusOKResponse
 import com.github.nikitavbv.servicemonitor.exceptions.AuthRequiredException
 import com.github.nikitavbv.servicemonitor.exceptions.MissingParameterException
 import com.github.nikitavbv.servicemonitor.exceptions.UnknownParameterException
+import com.github.nikitavbv.servicemonitor.metric.resources.CPUMetricRepository
+import com.github.nikitavbv.servicemonitor.metric.resources.DiskUsageMetricRepository
+import com.github.nikitavbv.servicemonitor.metric.resources.DockerMetricRepository
+import com.github.nikitavbv.servicemonitor.metric.resources.IOMetricRepository
 import com.github.nikitavbv.servicemonitor.metric.resources.MemoryMetricRepository
+import com.github.nikitavbv.servicemonitor.metric.resources.NetworkMetricRepository
+import com.github.nikitavbv.servicemonitor.metric.resources.UptimeMetricRepository
 import com.github.nikitavbv.servicemonitor.search.SearchEngine
 import com.github.nikitavbv.servicemonitor.user.ApplicationUserRepository
 import org.springframework.beans.factory.annotation.Autowired
@@ -31,7 +37,13 @@ import javax.ws.rs.Path
 class ProjectController(
     val projectRepository: ProjectRepository,
 
-    val memoryMetricRepository: MemoryMetricRepository
+    val memoryMetricRepository: MemoryMetricRepository,
+    val ioMetricRepository: IOMetricRepository,
+    val diskUsageMetricRepository: DiskUsageMetricRepository,
+    val cpuMetricRepository: CPUMetricRepository,
+    val uptimeMetricRepository: UptimeMetricRepository,
+    val networkMetricRepository: NetworkMetricRepository,
+    val dockerMetricRepository: DockerMetricRepository
 ) {
 
     @Autowired
@@ -69,7 +81,13 @@ class ProjectController(
             ))
 
             val metricsMap = agent.getMetricsAsMap(
-                memoryMetricRepository
+                memoryMetricRepository,
+                ioMetricRepository,
+                diskUsageMetricRepository,
+                cpuMetricRepository,
+                uptimeMetricRepository,
+                networkMetricRepository,
+                dockerMetricRepository
             )
             metricsMap.values.forEach {
                 val metricMap: MutableMap<String, Any?> = mutableMapOf()
@@ -123,7 +141,13 @@ class ProjectController(
                 "name" to agent.name,
                 "properties" to agent.properties,
                 "metrics" to agent.getMetricsAsMap(
-                    memoryMetricRepository
+                    memoryMetricRepository,
+                    ioMetricRepository,
+                    diskUsageMetricRepository,
+                    cpuMetricRepository,
+                    uptimeMetricRepository,
+                    networkMetricRepository,
+                    dockerMetricRepository
                 )
             ))
         }
