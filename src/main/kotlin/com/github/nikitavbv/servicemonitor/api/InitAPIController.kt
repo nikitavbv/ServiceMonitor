@@ -6,7 +6,9 @@ import com.github.nikitavbv.servicemonitor.metric.resources.DiskUsageMetricRepos
 import com.github.nikitavbv.servicemonitor.metric.resources.DockerMetricRepository
 import com.github.nikitavbv.servicemonitor.metric.resources.IOMetricRepository
 import com.github.nikitavbv.servicemonitor.metric.resources.MemoryMetricRepository
+import com.github.nikitavbv.servicemonitor.metric.resources.MysqlMetricRepository
 import com.github.nikitavbv.servicemonitor.metric.resources.NetworkMetricRepository
+import com.github.nikitavbv.servicemonitor.metric.resources.NginxMetricRepository
 import com.github.nikitavbv.servicemonitor.metric.resources.UptimeMetricRepository
 import com.github.nikitavbv.servicemonitor.user.ApplicationUserRepository
 import org.springframework.web.bind.annotation.GetMapping
@@ -26,7 +28,9 @@ class InitAPIController(
     val cpuMetricRepository: CPUMetricRepository,
     val uptimeMetricRepository: UptimeMetricRepository,
     val networkMetricRepository: NetworkMetricRepository,
-    val dockerMetricRepository: DockerMetricRepository
+    val dockerMetricRepository: DockerMetricRepository,
+    val nginxMetricRepository: NginxMetricRepository,
+    val mysqlMetricRepository: MysqlMetricRepository
 ) {
 
     @GetMapping(INIT_API)
@@ -51,7 +55,9 @@ class InitAPIController(
                                     cpuMetricRepository,
                                     uptimeMetricRepository,
                                     networkMetricRepository,
-                                    dockerMetricRepository
+                                    dockerMetricRepository,
+                                    nginxMetricRepository,
+                                    mysqlMetricRepository
                                 )
                             )
                         )

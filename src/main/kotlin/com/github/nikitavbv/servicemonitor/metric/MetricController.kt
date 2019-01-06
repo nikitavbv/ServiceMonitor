@@ -27,9 +27,13 @@ import com.github.nikitavbv.servicemonitor.metric.resources.IOMetric
 import com.github.nikitavbv.servicemonitor.metric.resources.IOMetricRepository
 import com.github.nikitavbv.servicemonitor.metric.resources.MemoryMetric
 import com.github.nikitavbv.servicemonitor.metric.resources.MemoryMetricRepository
+import com.github.nikitavbv.servicemonitor.metric.resources.MysqlMetric
+import com.github.nikitavbv.servicemonitor.metric.resources.MysqlMetricRepository
 import com.github.nikitavbv.servicemonitor.metric.resources.NetworkDeviceDataRepository
 import com.github.nikitavbv.servicemonitor.metric.resources.NetworkMetric
 import com.github.nikitavbv.servicemonitor.metric.resources.NetworkMetricRepository
+import com.github.nikitavbv.servicemonitor.metric.resources.NginxMetric
+import com.github.nikitavbv.servicemonitor.metric.resources.NginxMetricRepository
 import com.github.nikitavbv.servicemonitor.metric.resources.UptimeMetric
 import com.github.nikitavbv.servicemonitor.metric.resources.UptimeMetricRepository
 import com.github.nikitavbv.servicemonitor.user.ApplicationUserRepository
@@ -65,6 +69,8 @@ class MetricController(
     var networkDeviceDataRepository: NetworkDeviceDataRepository,
     var dockerMetricRepository: DockerMetricRepository,
     var dockerContainerDataRepository: DockerContainerDataRepository,
+    var nginxMetricRepository: NginxMetricRepository,
+    var mysqlMetricRepository: MysqlMetricRepository,
 
     var alertRepository: AlertRepository
 ) {
@@ -108,7 +114,8 @@ class MetricController(
         }
 
         return mapOf(
-            "data" to result
+            "metric" to metric,
+            "history" to result
         )
     }
 
@@ -158,6 +165,14 @@ class MetricController(
                 MetricType.DOCKER.typeName -> addDockerRecord(
                     metric,
                     mapper.convertValue(metricData, DockerMetric::class.java)
+                )
+                MetricType.NGINX.typeName -> addNginxRecord(
+                    metric,
+                    mapper.convertValue(metricData, NginxMetric::class.java)
+                )
+                MetricType.MYSQL.typeName -> addMysqlRecord(
+                    metric,
+                    mapper.convertValue(metricData, MysqlMetric::class.java)
                 )
                 else -> throw InvalidParameterValueException(METRICS_BODY_KEY, "unknown metric type: $metricType")
             }
@@ -218,6 +233,20 @@ class MetricController(
         metric.metricBase = metricBase
         dockerMetricRepository.save(metric)
         metric.containers.forEach { it.metric = metric; dockerContainerDataRepository.save(it) }
+        metricBase.lastEntryID = metric.id
+        metricRepository.save(metricBase)
+    }
+
+    fun addNginxRecord(metricBase: Metric, metric: NginxMetric) {
+        metric.metricBase = metricBase
+        nginxMetricRepository.save(metric)
+        metricBase.lastEntryID = metric.id
+        metricRepository.save(metricBase)
+    }
+
+    fun addMysqlRecord(metricBase: Metric, metric: MysqlMetric) {
+        metric.metricBase = metricBase
+        mysqlMetricRepository.save(metric)
         metricBase.lastEntryID = metric.id
         metricRepository.save(metricBase)
     }

@@ -9,4 +9,6 @@ enum class MetricType(val typeName: String) {
     UPTIME("uptime"),
     NETWORK("network"),
     DOCKER("docker"),
+    NGINX("nginx"),
+    MYSQL("mysql")
 }

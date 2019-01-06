@@ -12,7 +12,9 @@ import com.github.nikitavbv.servicemonitor.metric.resources.DiskUsageMetricRepos
 import com.github.nikitavbv.servicemonitor.metric.resources.DockerMetricRepository
 import com.github.nikitavbv.servicemonitor.metric.resources.IOMetricRepository
 import com.github.nikitavbv.servicemonitor.metric.resources.MemoryMetricRepository
+import com.github.nikitavbv.servicemonitor.metric.resources.MysqlMetricRepository
 import com.github.nikitavbv.servicemonitor.metric.resources.NetworkMetricRepository
+import com.github.nikitavbv.servicemonitor.metric.resources.NginxMetricRepository
 import com.github.nikitavbv.servicemonitor.metric.resources.UptimeMetricRepository
 import com.github.nikitavbv.servicemonitor.search.SearchEngine
 import com.github.nikitavbv.servicemonitor.user.ApplicationUserRepository
@@ -43,7 +45,9 @@ class ProjectController(
     val cpuMetricRepository: CPUMetricRepository,
     val uptimeMetricRepository: UptimeMetricRepository,
     val networkMetricRepository: NetworkMetricRepository,
-    val dockerMetricRepository: DockerMetricRepository
+    val dockerMetricRepository: DockerMetricRepository,
+    val nginxMetricRepository: NginxMetricRepository,
+    val mysqlMetricRepository: MysqlMetricRepository
 ) {
 
     @Autowired
@@ -87,7 +91,9 @@ class ProjectController(
                 cpuMetricRepository,
                 uptimeMetricRepository,
                 networkMetricRepository,
-                dockerMetricRepository
+                dockerMetricRepository,
+                nginxMetricRepository,
+                mysqlMetricRepository
             )
             metricsMap.values.forEach {
                 val metricMap: MutableMap<String, Any?> = mutableMapOf()
@@ -147,7 +153,9 @@ class ProjectController(
                     cpuMetricRepository,
                     uptimeMetricRepository,
                     networkMetricRepository,
-                    dockerMetricRepository
+                    dockerMetricRepository,
+                    nginxMetricRepository,
+                    mysqlMetricRepository
                 )
             ))
         }

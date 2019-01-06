@@ -9,7 +9,9 @@ import com.github.nikitavbv.servicemonitor.metric.resources.DockerMetricReposito
 import com.github.nikitavbv.servicemonitor.metric.resources.IOMetricRepository
 import com.github.nikitavbv.servicemonitor.metric.resources.MemoryMetric
 import com.github.nikitavbv.servicemonitor.metric.resources.MemoryMetricRepository
+import com.github.nikitavbv.servicemonitor.metric.resources.MysqlMetricRepository
 import com.github.nikitavbv.servicemonitor.metric.resources.NetworkMetricRepository
+import com.github.nikitavbv.servicemonitor.metric.resources.NginxMetricRepository
 import com.github.nikitavbv.servicemonitor.metric.resources.UptimeMetricRepository
 import com.github.nikitavbv.servicemonitor.project.Project
 import org.springframework.beans.factory.annotation.Autowired
@@ -69,7 +71,9 @@ data class Agent(
         cpuMetricRepository: CPUMetricRepository,
         uptimeMetricRepository: UptimeMetricRepository,
         networkMetricRepository: NetworkMetricRepository,
-        dockerMetricRepository: DockerMetricRepository
+        dockerMetricRepository: DockerMetricRepository,
+        nginxMetricRepository: NginxMetricRepository,
+        mysqlMetricRepository: MysqlMetricRepository
     ): MutableMap<String, Map<String, Any?>> {
         val metricsData: MutableMap<String, Map<String, Any?>> = mutableMapOf()
         metrics.forEach {
@@ -117,6 +121,18 @@ data class Agent(
                         val dockerMetric = dockerMetricRepository.findById(lastEntryId)
                         if (dockerMetric.isPresent) {
                             metricsData[tag] = dockerMetric.get().asMap()
+                        }
+                    }
+                    MetricType.NGINX.typeName -> {
+                        val nginxMetric = nginxMetricRepository.findById(lastEntryId)
+                        if (nginxMetric.isPresent) {
+                            metricsData[tag] = nginxMetric.get().asMap()
+                        }
+                    }
+                    MetricType.MYSQL.typeName -> {
+                        val mysqlMetric = mysqlMetricRepository.findById(lastEntryId)
+                        if (mysqlMetric.isPresent) {
+                            metricsData[tag] = mysqlMetric.get().asMap()
                         }
                     }
                 }

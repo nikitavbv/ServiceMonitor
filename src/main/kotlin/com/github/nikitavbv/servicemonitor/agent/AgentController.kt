@@ -10,7 +10,9 @@ import com.github.nikitavbv.servicemonitor.metric.resources.DiskUsageMetricRepos
 import com.github.nikitavbv.servicemonitor.metric.resources.DockerMetricRepository
 import com.github.nikitavbv.servicemonitor.metric.resources.IOMetricRepository
 import com.github.nikitavbv.servicemonitor.metric.resources.MemoryMetricRepository
+import com.github.nikitavbv.servicemonitor.metric.resources.MysqlMetricRepository
 import com.github.nikitavbv.servicemonitor.metric.resources.NetworkMetricRepository
+import com.github.nikitavbv.servicemonitor.metric.resources.NginxMetricRepository
 import com.github.nikitavbv.servicemonitor.metric.resources.UptimeMetricRepository
 import com.github.nikitavbv.servicemonitor.project.ProjectNotFoundException
 import com.github.nikitavbv.servicemonitor.project.ProjectRepository
@@ -37,7 +39,9 @@ class AgentController(
     val cpuMetricRepository: CPUMetricRepository,
     val uptimeMetricRepository: UptimeMetricRepository,
     val networkMetricRepository: NetworkMetricRepository,
-    val dockerMetricRepository: DockerMetricRepository
+    val dockerMetricRepository: DockerMetricRepository,
+    val nginxMetricRepository: NginxMetricRepository,
+    val mysqlMetricRepository: MysqlMetricRepository
 ) {
 
     @GetMapping()
@@ -54,7 +58,9 @@ class AgentController(
                 cpuMetricRepository,
                 uptimeMetricRepository,
                 networkMetricRepository,
-                dockerMetricRepository
+                dockerMetricRepository,
+                nginxMetricRepository,
+                mysqlMetricRepository
             )
         )
     }
@@ -77,7 +83,9 @@ class AgentController(
                             cpuMetricRepository,
                             uptimeMetricRepository,
                             networkMetricRepository,
-                            dockerMetricRepository
+                            dockerMetricRepository,
+                            nginxMetricRepository,
+                            mysqlMetricRepository
                         )
                     )
                 )
