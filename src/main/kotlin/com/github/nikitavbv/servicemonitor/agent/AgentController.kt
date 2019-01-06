@@ -221,6 +221,24 @@ class AgentController(
             if (it != "token") {
                 when (it) {
                     "name" -> agent.name = updates[it].toString()
+                    "tags.add" -> {
+                        val tags = agent.tags.split(",")
+                            .filter{ tagName -> tagName != "" }.toMutableList()
+                        updates[it].toString().split(",").forEach { tag ->
+                            if (!tags.contains(tag)) {
+                                tags.add(tag)
+                            }
+                        }
+                        agent.tags = tags.joinToString(",")
+                    }
+                    "tags.remove" -> {
+                        val tags = agent.tags.split(",")
+                            .filter{ tagName -> tagName != "" }.toMutableList()
+                        updates[it].toString().split(",").forEach { tag ->
+                            tags.remove(tag)
+                        }
+                        agent.tags = tags.joinToString(",")
+                    }
                     "properties" -> {
                         val properties = updates["properties"] as Map<*, *>
                         properties.keys.forEach { propertyName ->

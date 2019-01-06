@@ -53,6 +53,8 @@ data class Agent(
     @ElementCollection(fetch = FetchType.EAGER)
     val properties: MutableMap<String, String> = mutableMapOf(),
 
+    var tags: String = "",
+
     @JsonIgnore
     @OneToMany(cascade = [CascadeType.ALL], fetch = FetchType.LAZY, mappedBy = "agent")
     val metrics: List<Metric> = mutableListOf()
@@ -74,11 +76,17 @@ data class Agent(
         nginxMetricRepository: NginxMetricRepository,
         mysqlMetricRepository: MysqlMetricRepository
     ): Map<String, Any?> {
+        var tagsArray = emptyArray<String>()
+        if (tags != "") {
+            tagsArray = tags.split(",").filter { it != "" }.toTypedArray()
+        }
+
         return mapOf(
             "id" to id,
             "type" to type,
             "name" to name,
             "properties" to properties,
+            "tags" to tagsArray,
             "metrics" to getMetricsAsMap(
                 memoryMetricRepository,
                 ioMetricRepository,
