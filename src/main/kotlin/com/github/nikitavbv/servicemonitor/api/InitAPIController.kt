@@ -39,7 +39,7 @@ class InitAPIController(
                         )
                     }
                 }
-                InitAPIResponse(status = STATUS_OK, agents = agents)
+                InitAPIResponse(status = STATUS_OK, agents = agents, projects = user.projects)
             }
         }
     }
