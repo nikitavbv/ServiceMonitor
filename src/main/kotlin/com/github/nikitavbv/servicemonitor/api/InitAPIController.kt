@@ -47,6 +47,7 @@ class InitAPIController(
                             mapOf(
                                 "id" to agent.id,
                                 "name" to agent.name,
+                                "type" to agent.type,
                                 "properties" to agent.properties,
                                 "metrics" to agent.getMetricsAsMap(
                                     memoryMetricRepository,

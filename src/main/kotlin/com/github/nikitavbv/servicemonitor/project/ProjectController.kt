@@ -2,9 +2,7 @@ package com.github.nikitavbv.servicemonitor.project
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.nikitavbv.servicemonitor.PROJECT_API
-import com.github.nikitavbv.servicemonitor.agent.Agent
 import com.github.nikitavbv.servicemonitor.api.StatusOKResponse
-import com.github.nikitavbv.servicemonitor.exceptions.AuthRequiredException
 import com.github.nikitavbv.servicemonitor.exceptions.MissingParameterException
 import com.github.nikitavbv.servicemonitor.exceptions.UnknownParameterException
 import com.github.nikitavbv.servicemonitor.metric.resources.CPUMetricRepository
@@ -19,7 +17,6 @@ import com.github.nikitavbv.servicemonitor.metric.resources.UptimeMetricReposito
 import com.github.nikitavbv.servicemonitor.search.SearchEngine
 import com.github.nikitavbv.servicemonitor.user.ApplicationUserRepository
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -28,11 +25,7 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import java.io.BufferedReader
-import java.io.Reader
-import java.security.InvalidParameterException
 import javax.servlet.http.HttpServletRequest
-import javax.ws.rs.Path
 
 @RestController
 @RequestMapping(PROJECT_API)
@@ -49,9 +42,6 @@ class ProjectController(
     val nginxMetricRepository: NginxMetricRepository,
     val mysqlMetricRepository: MysqlMetricRepository
 ) {
-
-    @Autowired
-    lateinit var objectMapper: ObjectMapper
 
     @Autowired
     lateinit var applicationUserRepository: ApplicationUserRepository

@@ -39,6 +39,7 @@ data class Agent(
     var id: Long? = null,
 
     var name: String? = null,
+    var type: String = "generic",
 
     var apiKey: String? = null,
 
@@ -51,7 +52,7 @@ data class Agent(
     @JsonIgnore
     var project: Project? = null,
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     val properties: MutableMap<String, String> = mutableMapOf(),
 
     @JsonIgnore
