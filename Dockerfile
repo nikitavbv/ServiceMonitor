@@ -28,4 +28,6 @@ RUN cd /app/frontend \
     && cd .. && rm frontend -rf
 RUN bash -c "source \"/root/.sdkman/bin/sdkman-init.sh\" && gradle assemble"
 
+ADD agent/agent /app/agent
+
 CMD ["java", "-Xmx64M", "-Xms64M", "-jar", "/app/build/libs/app-0.0.1-SNAPSHOT.jar"]

@@ -33,6 +33,7 @@ class WebSecurity(
                 .antMatchers(HttpMethod.POST, METRIC_API).permitAll()
                 .antMatchers(HttpMethod.GET, INIT_API).permitAll()
                 .antMatchers(HttpMethod.GET, STATUS_API).permitAll()
+                .antMatchers(INSTALL_API).permitAll()
                 .antMatchers(API_PATH_PATTERN).authenticated()
                 .and()
                 .addFilter(JWTAuthorizationFilter(securityProperties, authenticationManager()))

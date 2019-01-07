@@ -6,4 +6,5 @@ spring.datasource.username=servicemonitorci
 spring.datasource.password=
 spring.datasource.driver-class=name=org.h2.Driver
 
+app.general.url=http://localhost:8080
 app.security.secret=vGIbQaxnuofjXifPhNIOphdjbh+TYxqQ/2zgRtmtzdFlN9WLYTbSKGpANHUjCJ7aLvJftnt08h4t6hcgp6pwmA==

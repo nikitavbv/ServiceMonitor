@@ -9,5 +9,6 @@ const val ALERT_API = "$API_ROOT/alert"
 const val INIT_API = "$API_ROOT/init"
 const val USER_API = "$API_ROOT/users"
 const val STATUS_API = "$API_ROOT/status"
+const val INSTALL_API = "/install"
 
 const val API_PATH_PATTERN = "/api/v1/**"
