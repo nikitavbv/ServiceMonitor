@@ -96,6 +96,62 @@ class MetricController(
                 query.setParameter("toDate", Date(to))
                 result = query.stream().map { (it as MemoryMetric).asMap() }.collect(Collectors.toList())
             }
+            MetricType.IO.typeName -> {
+                val query = sessionFactory.openSession().createQuery("from IOMetric m WHERE m.metricBase.id = :id AND m.timestamp BETWEEN :fromDate AND :toDate")
+                query.setParameter("id", metric.id)
+                query.setParameter("fromDate", Date(from))
+                query.setParameter("toDate", Date(to))
+                result = query.stream().map { (it as IOMetric).asMap() }.collect(Collectors.toList())
+            }
+            MetricType.DISK_USAGE.typeName -> {
+                val query = sessionFactory.openSession().createQuery("from DiskUsageMetric m WHERE m.metricBase.id = :id AND m.timestamp BETWEEN :fromDate AND :toDate")
+                query.setParameter("id", metric.id)
+                query.setParameter("fromDate", Date(from))
+                query.setParameter("toDate", Date(to))
+                result = query.stream().map { (it as DiskUsageMetric).asMap() }.collect(Collectors.toList())
+            }
+            MetricType.CPU.typeName -> {
+                val query = sessionFactory.openSession().createQuery("from CPUMetric m WHERE m.metricBase.id = :id AND m.timestamp BETWEEN :fromDate AND :toDate")
+                query.setParameter("id", metric.id)
+                query.setParameter("fromDate", Date(from))
+                query.setParameter("toDate", Date(to))
+                result = query.stream().map { (it as CPUMetric).asMap() }.collect(Collectors.toList())
+            }
+            MetricType.UPTIME.typeName -> {
+                val query = sessionFactory.openSession().createQuery("from UptimeMetric m WHERE m.metricBase.id = :id AND m.timestamp BETWEEN :fromDate AND :toDate")
+                query.setParameter("id", metric.id)
+                query.setParameter("fromDate", Date(from))
+                query.setParameter("toDate", Date(to))
+                result = query.stream().map { (it as UptimeMetric).asMap() }.collect(Collectors.toList())
+            }
+            MetricType.NETWORK.typeName -> {
+                val query = sessionFactory.openSession().createQuery("from NetworkMetric m WHERE m.metricBase.id = :id AND m.timestamp BETWEEN :fromDate AND :toDate")
+                query.setParameter("id", metric.id)
+                query.setParameter("fromDate", Date(from))
+                query.setParameter("toDate", Date(to))
+                result = query.stream().map { (it as NetworkMetric).asMap() }.collect(Collectors.toList())
+            }
+            MetricType.DOCKER.typeName -> {
+                val query = sessionFactory.openSession().createQuery("from DockerMetric m WHERE m.metricBase.id = :id AND m.timestamp BETWEEN :fromDate AND :toDate")
+                query.setParameter("id", metric.id)
+                query.setParameter("fromDate", Date(from))
+                query.setParameter("toDate", Date(to))
+                result = query.stream().map { (it as DockerMetric).asMap() }.collect(Collectors.toList())
+            }
+            MetricType.NGINX.typeName -> {
+                val query = sessionFactory.openSession().createQuery("from NginxMetric m WHERE m.metricBase.id = :id AND m.timestamp BETWEEN :fromDate AND :toDate")
+                query.setParameter("id", metric.id)
+                query.setParameter("fromDate", Date(from))
+                query.setParameter("toDate", Date(to))
+                result = query.stream().map { (it as NginxMetric).asMap() }.collect(Collectors.toList())
+            }
+            MetricType.MYSQL.typeName -> {
+                val query = sessionFactory.openSession().createQuery("from MysqlMetric m WHERE m.metricBase.id = :id AND m.timestamp BETWEEN :fromDate AND :toDate")
+                query.setParameter("id", metric.id)
+                query.setParameter("fromDate", Date(from))
+                query.setParameter("toDate", Date(to))
+                result = query.stream().map { (it as MysqlMetric).asMap() }.collect(Collectors.toList())
+            }
             else -> throw throw InvalidParameterValueException(METRICS_BODY_KEY, "unknown metric type: ${metric.type}")
         }
 

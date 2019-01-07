@@ -28,7 +28,8 @@ data class DockerMetric(
         return mapOf(
             "type" to MetricType.DOCKER.typeName,
             "id" to metricBase.id,
-            "containers" to containers
+            "containers" to containers,
+            "timestamp" to timestamp
         )
     }
 

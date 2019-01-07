@@ -28,7 +28,8 @@ data class DiskUsageMetric(
         return mapOf(
             "type" to MetricType.DISK_USAGE.typeName,
             "id" to metricBase.id,
-            "filesystems" to filesystems
+            "filesystems" to filesystems,
+            "timestamp" to timestamp
         )
     }
 

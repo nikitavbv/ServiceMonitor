@@ -28,7 +28,8 @@ data class IOMetric(
         return mapOf(
             "type" to MetricType.IO.typeName,
             "id" to metricBase.id,
-            "devices" to devices
+            "devices" to devices,
+            "timestamp" to timestamp
         )
     }
 
