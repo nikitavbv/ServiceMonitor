@@ -4,6 +4,7 @@ import com.github.nikitavbv.servicemonitor.PROJECT_API
 import com.github.nikitavbv.servicemonitor.api.StatusOKResponse
 import com.github.nikitavbv.servicemonitor.exceptions.MissingParameterException
 import com.github.nikitavbv.servicemonitor.exceptions.UnknownParameterException
+import com.github.nikitavbv.servicemonitor.exceptions.UserNotFoundException
 import com.github.nikitavbv.servicemonitor.metric.resources.CPUMetricRepository
 import com.github.nikitavbv.servicemonitor.metric.resources.DiskUsageMetricRepository
 import com.github.nikitavbv.servicemonitor.metric.resources.DockerMetricRepository
@@ -106,6 +107,12 @@ class ProjectController(
         updates.keys.forEach {
             when (it) {
                 "name" -> project.name = updates[it].toString()
+                "user.add" -> {
+                    val userToAdd = applicationUserRepository.findByUsername(updates[it].toString())
+                    project.users.add(userToAdd)
+                    userToAdd.projects.add(project)
+                    applicationUserRepository.save(userToAdd)
+                }
                 else -> throw UnknownParameterException(it)
             }
         }

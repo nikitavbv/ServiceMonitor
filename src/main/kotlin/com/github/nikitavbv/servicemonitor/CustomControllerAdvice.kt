@@ -7,6 +7,7 @@ import com.github.nikitavbv.servicemonitor.exceptions.InvalidParameterValueExcep
 import com.github.nikitavbv.servicemonitor.exceptions.MissingAPIKeyException
 import com.github.nikitavbv.servicemonitor.exceptions.MissingParameterException
 import com.github.nikitavbv.servicemonitor.exceptions.UnknownParameterException
+import com.github.nikitavbv.servicemonitor.exceptions.UserNotFoundException
 import com.github.nikitavbv.servicemonitor.metric.MetricNotFoundException
 import com.github.nikitavbv.servicemonitor.project.ProjectNotFoundException
 import com.github.nikitavbv.servicemonitor.security.PermissionDeniedException
@@ -130,6 +131,11 @@ class CustomControllerAdvice {
     @ExceptionHandler(MetricNotFoundException::class)
     fun handleMetricNotFoundException(exception: MetricNotFoundException): ResponseEntity<Map<String, String?>> {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("error" to "metric_not_found"))
+    }
+
+    @ExceptionHandler(UserNotFoundException::class)
+    fun handleUserNotFoundException(exception: UserNotFoundException): ResponseEntity<Map<String, String?>> {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("error" to "user_not_found"))
     }
 
     @ExceptionHandler(SignatureException::class)
