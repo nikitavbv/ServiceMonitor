@@ -80,9 +80,10 @@ data class Agent(
         if (tags != "") {
             tagsArray = tags.split(",").filter { it != "" }.toTypedArray()
         }
-
+        
         return mapOf(
             "id" to id,
+            "projectID" to project?.id,
             "type" to type,
             "name" to name,
             "properties" to properties,

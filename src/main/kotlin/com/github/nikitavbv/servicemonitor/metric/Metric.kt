@@ -30,7 +30,7 @@ data class Metric(
 
     @JsonIgnore
     @OneToMany(cascade = [CascadeType.ALL], fetch = FetchType.LAZY, mappedBy = "metric")
-    val alerts: List<Alert> = mutableListOf()
+    val alerts: MutableList<Alert> = mutableListOf()
 ) {
 
 

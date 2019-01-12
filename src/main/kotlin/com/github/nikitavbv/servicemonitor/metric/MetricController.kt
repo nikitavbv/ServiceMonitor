@@ -171,7 +171,8 @@ class MetricController(
 
         return mapOf(
             "metric" to metric,
-            "history" to result
+            "history" to result,
+            "alerts" to metric.alerts
         )
     }
 
