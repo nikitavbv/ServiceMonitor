@@ -30,7 +30,7 @@ import javax.persistence.PrePersist
 import javax.persistence.Table
 
 @Entity
-@Table(name="agent")
+@Table(name = "agent")
 data class Agent(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "agent_id")
@@ -80,7 +80,7 @@ data class Agent(
         if (tags != "") {
             tagsArray = tags.split(",").filter { it != "" }.toTypedArray()
         }
-        
+
         return mapOf(
             "id" to id,
             "projectID" to project?.id,

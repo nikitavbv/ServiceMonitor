@@ -223,7 +223,7 @@ class AgentController(
                     "name" -> agent.name = updates[it].toString()
                     "tags.add" -> {
                         val tags = agent.tags.split(",")
-                            .filter{ tagName -> tagName != "" }.toMutableList()
+                            .filter { tagName -> tagName != "" }.toMutableList()
                         updates[it].toString().split(",").forEach { tag ->
                             if (!tags.contains(tag)) {
                                 tags.add(tag)
@@ -233,7 +233,7 @@ class AgentController(
                     }
                     "tags.remove" -> {
                         val tags = agent.tags.split(",")
-                            .filter{ tagName -> tagName != "" }.toMutableList()
+                            .filter { tagName -> tagName != "" }.toMutableList()
                         updates[it].toString().split(",").forEach { tag ->
                             tags.remove(tag)
                         }
