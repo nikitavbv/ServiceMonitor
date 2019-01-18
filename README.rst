@@ -8,12 +8,10 @@ Service Monitor
 
 Application performance monitoring.
 
-Currently in development.
-
 =====
 
 Features:
-    - Server cpu/ram/io monitoring
+    - Server cpu/ram/io/network monitoring
     - NGINX stats
     - API availability & uptime
     - MySQL stats
