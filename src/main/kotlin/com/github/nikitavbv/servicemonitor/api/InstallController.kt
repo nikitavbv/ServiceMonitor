@@ -59,5 +59,4 @@ class InstallController (
         val fileInputStream = FileInputStream("/app/agent")
         IOUtils.copy(fileInputStream, response.outputStream)
     }
-
 }

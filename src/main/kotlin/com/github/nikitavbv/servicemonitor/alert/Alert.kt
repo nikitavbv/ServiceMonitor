@@ -16,7 +16,7 @@ import javax.persistence.ManyToOne
 private const val ALERT_MIN_TIME_DIFFERENCE = 5 * 60 * 1000L
 
 @Entity
-data class Alert (
+data class Alert(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
 
@@ -39,25 +39,8 @@ data class Alert (
         val state = checkIfTrigger(data) ?: return
 
         if (state && !actionExecuted) {
-            val triggerDate = triggeredAt
-            if (triggerDate != null) {
-                val timeDifference = Date().time - triggerDate.time
-                if (timeDifference > ALERT_MIN_TIME_DIFFERENCE) {
-                    try {
-                        runAction(action)
-                        actionExecuted = true
-                    } catch(e: Exception) {
-                        println("Running action failed with exception")
-                        return
-                    }
-                } else {
-                    return
-                }
-            } else {
-                triggeredAt = Date()
-                alertRepository.save(this)
-                return
-            }
+            checkTimeAndRunAction(state, alertRepository)
+            return
         }
 
         if (state == triggered) {
@@ -71,6 +54,30 @@ data class Alert (
 
         triggered = state
         alertRepository.save(this)
+    }
+
+    private fun checkTimeAndRunAction(state: Boolean, alertRepository: AlertRepository) {
+        val triggerDate = triggeredAt
+        if (triggerDate != null) {
+            val timeDifference = Date().time - triggerDate.time
+            if (timeDifference > ALERT_MIN_TIME_DIFFERENCE) {
+                try {
+                    runAction(action)
+                    actionExecuted = true
+                    triggered = state
+                    alertRepository.save(this)
+                } catch (e: Exception) {
+                    println("Running action failed with exception")
+                    return
+                }
+            } else {
+                return
+            }
+        } else {
+            triggeredAt = Date()
+            alertRepository.save(this)
+            return
+        }
     }
 
     private fun runAction(action: String) {
@@ -87,12 +94,12 @@ data class Alert (
     }
 
     private fun getValueByParamExpression(data: Map<*, *>, expression: String): Any? {
-        val keyPart = when(expression.contains(".")) {
+        val keyPart = when (expression.contains(".")) {
             true -> expression.substring(0, expression.indexOf('.'))
             false -> expression
         }
         var action: String? = null
-        val keyToGet = when(keyPart.contains(':')) {
+        val keyToGet = when (keyPart.contains(':')) {
             true -> {
                 val splitIndex = keyPart.indexOf(":")
                 action = keyPart.substring(splitIndex)
@@ -114,7 +121,7 @@ data class Alert (
     }
 
     private fun applyAction(dataValue: Any, action: String): Any? {
-        return when(action) {
+        return when (action) {
             "size" -> {
                 when (dataValue) {
                     is List<*> -> dataValue.size
@@ -133,7 +140,7 @@ data class Alert (
     }
 
     private fun compareValueToLevel(value: Any, condition: String, level: String): Boolean? {
-        return when(condition) {
+        return when (condition) {
             "<" -> compareLessThan(value, level)
             ">" -> compareBiggerThan(value, level)
             else -> {
@@ -144,7 +151,7 @@ data class Alert (
     }
 
     private fun compareLessThan(value: Any, level: String): Boolean? {
-        return when(value) {
+        return when (value) {
             is String -> value.toDouble() < level.toDouble()
             is Int -> value < level.toInt()
             else -> {
@@ -155,7 +162,7 @@ data class Alert (
     }
 
     private fun compareBiggerThan(value: Any, level: String): Boolean? {
-        return when(value) {
+        return when (value) {
             is String -> value.toDouble() > level.toDouble()
             is Int -> value > level.toInt()
             else -> {
@@ -164,5 +171,4 @@ data class Alert (
             }
         }
     }
-
 }

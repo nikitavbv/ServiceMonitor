@@ -1,6 +1,7 @@
 package com.github.nikitavbv.servicemonitor.alert
 
 import com.github.nikitavbv.servicemonitor.ALERT_API
+import com.github.nikitavbv.servicemonitor.agent.Agent
 import com.github.nikitavbv.servicemonitor.agent.AgentNotFoundException
 import com.github.nikitavbv.servicemonitor.agent.AgentRepository
 import com.github.nikitavbv.servicemonitor.api.StatusOKResponse
@@ -9,6 +10,8 @@ import com.github.nikitavbv.servicemonitor.exceptions.AuthRequiredException
 import com.github.nikitavbv.servicemonitor.exceptions.MissingParameterException
 import com.github.nikitavbv.servicemonitor.metric.MetricNotFoundException
 import com.github.nikitavbv.servicemonitor.metric.MetricRepository
+import com.github.nikitavbv.servicemonitor.project.Project
+import com.github.nikitavbv.servicemonitor.user.ApplicationUser
 import com.github.nikitavbv.servicemonitor.user.ApplicationUserRepository
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -21,7 +24,7 @@ import javax.servlet.http.HttpServletRequest
 
 @RestController
 @RequestMapping(ALERT_API)
-class AlertController (
+class AlertController(
     val alertRepository: AlertRepository,
     val applicationUserRepository: ApplicationUserRepository,
     val agentRepository: AgentRepository,
@@ -31,23 +34,8 @@ class AlertController (
     @GetMapping
     fun getAllAlerts(req: HttpServletRequest): Map<String, Any?> {
         val user = applicationUserRepository.findByUsername(req.remoteUser ?: throw AuthRequiredException())
-        val alerts = mutableListOf<Map<String, Any?>>()
-        user.projects.forEach { project ->
-            project.agents.forEach { agent ->
-                agent.metrics.forEach { metric ->
-                    metric.alerts.forEach { alert ->
-                        alerts.add(
-                            mapOf(
-                                "alert" to alert,
-                                "metric" to alert.metric
-                            )
-                        )
-                    }
-                }
-            }
-        }
         return mapOf(
-            "alerts" to alerts
+            "alerts" to getAlertsForUser(user)
         )
     }
 
@@ -70,7 +58,7 @@ class AlertController (
             metric = metric,
             paramName = paramName,
             alertCondition = condition,
-            level=conditionLevel,
+            level = conditionLevel,
             action = action
         )
         alertRepository.save(alert)
@@ -98,4 +86,27 @@ class AlertController (
         return StatusOKResponse()
     }
 
+    fun getAlertsForUser(user: ApplicationUser): List<Map<String, Any?>> {
+        val alerts = mutableListOf<Map<String, Any?>>()
+        user.projects.forEach {
+            alerts.addAll(getAlertsForProject(it))
+        }
+        return alerts
+    }
+
+    fun getAlertsForProject(project: Project): List<Map<String, Any?>> {
+        val alerts = mutableListOf<Map<String, Any?>>()
+        project.agents.forEach {
+            alerts.addAll(getAlertsForAgent(it))
+        }
+        return alerts
+    }
+
+    fun getAlertsForAgent(agent: Agent): List<Map<String, Any?>> {
+        val alerts = mutableListOf<Map<String, Any?>>()
+        agent.metrics.forEach {
+            alerts.addAll(getAlertsForMetric(it))
+        }
+        return alerts
+    }
 }
