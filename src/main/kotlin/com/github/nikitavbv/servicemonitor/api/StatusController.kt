@@ -11,5 +11,4 @@ class StatusController {
     fun statusOK(): StatusOKResponse {
         return StatusOKResponse()
     }
-
 }

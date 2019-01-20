@@ -11,9 +11,9 @@ import javax.servlet.http.HttpServletResponse
 
 @RestController
 @RequestMapping(INSTALL_API)
-class InstallController (
+class InstallController(
     private val applicationProperties: ApplicationProperties
-){
+) {
 
     @GetMapping()
     fun getScript(token: String): String {
