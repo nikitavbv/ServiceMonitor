@@ -8,6 +8,7 @@ import com.github.nikitavbv.servicemonitor.api.StatusOKResponse
 import com.github.nikitavbv.servicemonitor.exceptions.AccessDeniedException
 import com.github.nikitavbv.servicemonitor.exceptions.AuthRequiredException
 import com.github.nikitavbv.servicemonitor.exceptions.MissingParameterException
+import com.github.nikitavbv.servicemonitor.metric.Metric
 import com.github.nikitavbv.servicemonitor.metric.MetricNotFoundException
 import com.github.nikitavbv.servicemonitor.metric.MetricRepository
 import com.github.nikitavbv.servicemonitor.project.Project
@@ -108,5 +109,14 @@ class AlertController(
             alerts.addAll(getAlertsForMetric(it))
         }
         return alerts
+    }
+
+    fun getAlertsForMetric(metric: Metric): List<Map<String, Any?>> {
+        return metric.alerts.map {
+            mapOf(
+                "alert" to it,
+                "metric" to it.metric
+            )
+        }.toList()
     }
 }
