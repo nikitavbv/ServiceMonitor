@@ -30,5 +30,4 @@ data class MysqlMetric(
             "timestamp" to timestamp
         )
     }
-
 }

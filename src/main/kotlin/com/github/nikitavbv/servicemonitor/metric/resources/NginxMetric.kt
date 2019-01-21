@@ -11,7 +11,7 @@ import javax.persistence.Id
 import javax.persistence.OneToOne
 
 @Entity
-data class NginxMetric (
+data class NginxMetric(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
 

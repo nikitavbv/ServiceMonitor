@@ -17,7 +17,7 @@ import javax.validation.constraints.NotEmpty
 @Table(name = "user")
 data class ApplicationUser(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="user_id")
+    @Column(name = "user_id")
     val id: Long? = null,
 
     @NotEmpty(message = "Username is required")

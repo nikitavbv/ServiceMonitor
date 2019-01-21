@@ -42,5 +42,4 @@ data class MemoryMetric(
             "timestamp" to timestamp
         )
     }
-
 }
