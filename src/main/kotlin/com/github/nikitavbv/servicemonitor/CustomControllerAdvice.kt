@@ -112,34 +112,4 @@ class CustomControllerAdvice {
             )
         )
     }
-
-    @ExceptionHandler(PermissionDeniedException::class)
-    fun handlePermissionDeniedException(exception: PermissionDeniedException): ResponseEntity<Map<String, String?>> {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(mapOf("message" to exception.message))
-    }
-
-    @ExceptionHandler(AgentNotFoundException::class)
-    fun handleAgentNotFoundException(exception: AgentNotFoundException): ResponseEntity<Map<String, String?>> {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("error" to "agent_not_found"))
-    }
-
-    @ExceptionHandler(ProjectNotFoundException::class)
-    fun handleProjectNotFoundException(exception: ProjectNotFoundException): ResponseEntity<Map<String, String?>> {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("error" to "project_not_found"))
-    }
-
-    @ExceptionHandler(MetricNotFoundException::class)
-    fun handleMetricNotFoundException(exception: MetricNotFoundException): ResponseEntity<Map<String, String?>> {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("error" to "metric_not_found"))
-    }
-
-    @ExceptionHandler(UserNotFoundException::class)
-    fun handleUserNotFoundException(exception: UserNotFoundException): ResponseEntity<Map<String, String?>> {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("error" to "user_not_found"))
-    }
-
-    @ExceptionHandler(SignatureException::class)
-    fun handleSignatureException(exception: SignatureException): ResponseEntity<Map<String, String?>> {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("error" to "auth_failed"))
-    }
 }
