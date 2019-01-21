@@ -87,85 +87,18 @@ class MetricController(
         val sessionFactory = entityManagerFactory.unwrap(SessionFactory::class.java)
         var result: MutableList<Map<String, Any?>>
         val pointsNeeded = points ?: DEFAULT_METRICS_POINTS
-        when (metric.type) {
-            MetricType.MEMORY.typeName -> {
-                val query = sessionFactory.openSession().createQuery("from MemoryMetric m WHERE m.metricBase.id = :id AND m.timestamp BETWEEN :fromDate AND :toDate")
-                query.setParameter("id", metric.id)
-                query.setParameter("fromDate", Date(from))
-                query.setParameter("toDate", Date(to))
-                result = query.stream().map { (it as MemoryMetric).asMap() }.collect(Collectors.toList())
-            }
-            MetricType.IO.typeName -> {
-                val query = sessionFactory.openSession().createQuery("from IOMetric m WHERE m.metricBase.id = :id AND m.timestamp BETWEEN :fromDate AND :toDate")
-                query.setParameter("id", metric.id)
-                query.setParameter("fromDate", Date(from))
-                query.setParameter("toDate", Date(to))
-                result = query.stream().map { (it as IOMetric).asMap() }.collect(Collectors.toList())
-            }
-            MetricType.DISK_USAGE.typeName -> {
-                val query = sessionFactory.openSession().createQuery("from DiskUsageMetric m WHERE m.metricBase.id = :id AND m.timestamp BETWEEN :fromDate AND :toDate")
-                query.setParameter("id", metric.id)
-                query.setParameter("fromDate", Date(from))
-                query.setParameter("toDate", Date(to))
-                result = query.stream().map { (it as DiskUsageMetric).asMap() }.collect(Collectors.toList())
-            }
-            MetricType.CPU.typeName -> {
-                val query = sessionFactory.openSession().createQuery("from CPUMetric m WHERE m.metricBase.id = :id AND m.timestamp BETWEEN :fromDate AND :toDate")
-                query.setParameter("id", metric.id)
-                query.setParameter("fromDate", Date(from))
-                query.setParameter("toDate", Date(to))
-                result = query.stream().map { (it as CPUMetric).asMap() }.collect(Collectors.toList())
-            }
-            MetricType.UPTIME.typeName -> {
-                val query = sessionFactory.openSession().createQuery("from UptimeMetric m WHERE m.metricBase.id = :id AND m.timestamp BETWEEN :fromDate AND :toDate")
-                query.setParameter("id", metric.id)
-                query.setParameter("fromDate", Date(from))
-                query.setParameter("toDate", Date(to))
-                result = query.stream().map { (it as UptimeMetric).asMap() }.collect(Collectors.toList())
-            }
-            MetricType.NETWORK.typeName -> {
-                val query = sessionFactory.openSession().createQuery("from NetworkMetric m WHERE m.metricBase.id = :id AND m.timestamp BETWEEN :fromDate AND :toDate")
-                query.setParameter("id", metric.id)
-                query.setParameter("fromDate", Date(from))
-                query.setParameter("toDate", Date(to))
-                result = query.stream().map { (it as NetworkMetric).asMap() }.collect(Collectors.toList())
-            }
-            MetricType.DOCKER.typeName -> {
-                val query = sessionFactory.openSession().createQuery("from DockerMetric m WHERE m.metricBase.id = :id AND m.timestamp BETWEEN :fromDate AND :toDate")
-                query.setParameter("id", metric.id)
-                query.setParameter("fromDate", Date(from))
-                query.setParameter("toDate", Date(to))
-                result = query.stream().map { (it as DockerMetric).asMap() }.collect(Collectors.toList())
-            }
-            MetricType.NGINX.typeName -> {
-                val query = sessionFactory.openSession().createQuery("from NginxMetric m WHERE m.metricBase.id = :id AND m.timestamp BETWEEN :fromDate AND :toDate")
-                query.setParameter("id", metric.id)
-                query.setParameter("fromDate", Date(from))
-                query.setParameter("toDate", Date(to))
-                result = query.stream().map { (it as NginxMetric).asMap() }.collect(Collectors.toList())
-            }
-            MetricType.MYSQL.typeName -> {
-                val query = sessionFactory.openSession().createQuery("from MysqlMetric m WHERE m.metricBase.id = :id AND m.timestamp BETWEEN :fromDate AND :toDate")
-                query.setParameter("id", metric.id)
-                query.setParameter("fromDate", Date(from))
-                query.setParameter("toDate", Date(to))
-                result = query.stream().map { (it as MysqlMetric).asMap() }.collect(Collectors.toList())
-            }
-            else -> throw throw InvalidParameterValueException(METRICS_BODY_KEY, "unknown metric type: ${metric.type}")
-        }
+
+        val query = sessionFactory.openSession().createQuery(
+            "from ${metric.javaClass.name} m WHERE m.metricBase.id = :id " +
+                "AND m.timestamp BETWEEN :fromDate and :toDate"
+        )
+        query.setParameter("id", metric.id)
+        query.setParameter("fromDate", Date(from))
+        query.setParameter("toDate", Date(to))
+        result = query.stream().map { (it as AbstractMetric).asMap() }.collect(Collectors.toList())
 
         if (result.size > pointsNeeded) {
-            val scaleFactor = pointsNeeded.toDouble() / result.size
-            var currentStep = 0.0
-            val newResult: MutableList<Map<String, Any?>> = mutableListOf()
-            result.forEach {
-                currentStep += scaleFactor
-                if (currentStep >= 1) {
-                    currentStep -= 1
-                    newResult.add(it)
-                }
-            }
-            result = newResult
+            result = reduceDataPoints(result, pointsNeeded)
         }
 
         return mapOf(
@@ -173,6 +106,20 @@ class MetricController(
             "history" to result,
             "alerts" to metric.alerts
         )
+    }
+
+    fun reduceDataPoints(points: List<Map<String, Any?>>, pointsNeeded: Long): MutableList<Map<String, Any?>> {
+        val scaleFactor = pointsNeeded.toDouble() / points.size
+        var currentStep = 0.0
+        val result: MutableList<Map<String, Any?>> = mutableListOf()
+        points.forEach {
+            currentStep += scaleFactor
+            if (currentStep >= 1) {
+                currentStep -= 1
+                result.add(it)
+            }
+        }
+        return result
     }
 
     @PostMapping

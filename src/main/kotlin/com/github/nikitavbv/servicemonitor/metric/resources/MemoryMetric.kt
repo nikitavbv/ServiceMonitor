@@ -1,5 +1,6 @@
 package com.github.nikitavbv.servicemonitor.metric.resources
 
+import com.github.nikitavbv.servicemonitor.metric.AbstractMetric
 import com.github.nikitavbv.servicemonitor.metric.Metric
 import com.github.nikitavbv.servicemonitor.metric.MetricType
 import java.util.Date
@@ -26,9 +27,9 @@ data class MemoryMetric(
     val cached: Long,
     val swapTotal: Long,
     val swapFree: Long
-) {
+) : AbstractMetric() {
 
-    fun asMap(): Map<String, Any?> {
+    override fun asMap(): Map<String, Any?> {
         return mapOf(
             "type" to MetricType.MEMORY.typeName,
             "id" to metricBase.id,

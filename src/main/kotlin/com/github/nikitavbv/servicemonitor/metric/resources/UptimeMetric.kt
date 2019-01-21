@@ -1,5 +1,6 @@
 package com.github.nikitavbv.servicemonitor.metric.resources
 
+import com.github.nikitavbv.servicemonitor.metric.AbstractMetric
 import com.github.nikitavbv.servicemonitor.metric.Metric
 import com.github.nikitavbv.servicemonitor.metric.MetricType
 import java.util.Date
@@ -20,9 +21,9 @@ data class UptimeMetric(
     val timestamp: Date,
 
     val uptime: Double
-) {
+) : AbstractMetric() {
 
-    fun asMap(): Map<String, Any?> {
+    override fun asMap(): Map<String, Any?> {
         return mapOf(
             "type" to MetricType.UPTIME.typeName,
             "id" to metricBase.id,

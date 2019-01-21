@@ -1,5 +1,6 @@
 package com.github.nikitavbv.servicemonitor.metric.resources
 
+import com.github.nikitavbv.servicemonitor.metric.AbstractMetric
 import com.github.nikitavbv.servicemonitor.metric.Metric
 import com.github.nikitavbv.servicemonitor.metric.MetricType
 import java.util.Date
@@ -22,9 +23,9 @@ data class NetworkMetric(
 
     @OneToMany(targetEntity = NetworkDeviceData::class, mappedBy = "metric", fetch = FetchType.EAGER)
     val devices: List<NetworkDeviceData>
-) {
+) : AbstractMetric() {
 
-    fun asMap(): Map<String, Any?> {
+    override fun asMap(): Map<String, Any?> {
         return mapOf(
             "type" to MetricType.NETWORK.typeName,
             "id" to metricBase.id,
