@@ -30,5 +30,4 @@ data class UptimeMetric(
             "timestamp" to timestamp
         )
     }
-
 }

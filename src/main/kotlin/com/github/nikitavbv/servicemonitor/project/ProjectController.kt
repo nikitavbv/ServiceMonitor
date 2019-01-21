@@ -4,7 +4,6 @@ import com.github.nikitavbv.servicemonitor.PROJECT_API
 import com.github.nikitavbv.servicemonitor.api.StatusOKResponse
 import com.github.nikitavbv.servicemonitor.exceptions.MissingParameterException
 import com.github.nikitavbv.servicemonitor.exceptions.UnknownParameterException
-import com.github.nikitavbv.servicemonitor.exceptions.UserNotFoundException
 import com.github.nikitavbv.servicemonitor.metric.resources.CPUMetricRepository
 import com.github.nikitavbv.servicemonitor.metric.resources.DiskUsageMetricRepository
 import com.github.nikitavbv.servicemonitor.metric.resources.DockerMetricRepository
@@ -14,7 +13,6 @@ import com.github.nikitavbv.servicemonitor.metric.resources.MysqlMetricRepositor
 import com.github.nikitavbv.servicemonitor.metric.resources.NetworkMetricRepository
 import com.github.nikitavbv.servicemonitor.metric.resources.NginxMetricRepository
 import com.github.nikitavbv.servicemonitor.metric.resources.UptimeMetricRepository
-import com.github.nikitavbv.servicemonitor.search.SearchEngine
 import com.github.nikitavbv.servicemonitor.user.ApplicationUserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -180,14 +178,5 @@ class ProjectController(
         project.starredMetrics.remove(metricID)
         projectRepository.save(project)
         return StatusOKResponse()
-    }
-
-    @GetMapping("/{projectID}/search")
-    fun doSearch(httpRequest: HttpServletRequest, @PathVariable projectID: Long, q: String): Map<String, Any?> {
-        val user = applicationUserRepository.findByUsername(httpRequest.remoteUser)
-        val searchEngine = SearchEngine(user.projects)
-        return mapOf(
-            "results" to searchEngine.doSearchFor(q)
-        )
     }
 }

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.github.nikitavbv.servicemonitor.agent.Agent
 import com.github.nikitavbv.servicemonitor.user.ApplicationUser
 import java.util.UUID
-import javax.persistence.CascadeType
 import javax.persistence.Column
 import javax.persistence.ElementCollection
 import javax.persistence.Entity
@@ -29,7 +28,7 @@ data class Project(
 
     var apiKey: String? = null,
 
-    @ManyToMany(mappedBy="projects")
+    @ManyToMany(mappedBy = "projects")
     @JsonIgnore
     var users: MutableList<ApplicationUser> = mutableListOf(),
 

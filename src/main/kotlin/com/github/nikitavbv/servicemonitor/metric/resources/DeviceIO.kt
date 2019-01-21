@@ -11,7 +11,7 @@ import javax.persistence.Id
 import javax.persistence.ManyToOne
 
 @Entity
-data class DeviceIO (
+data class DeviceIO(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
     @ManyToOne(cascade = [CascadeType.ALL], fetch = FetchType.LAZY)

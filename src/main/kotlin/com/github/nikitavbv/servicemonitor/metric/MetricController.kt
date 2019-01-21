@@ -15,7 +15,6 @@ import com.github.nikitavbv.servicemonitor.exceptions.MissingParameterException
 import com.github.nikitavbv.servicemonitor.metric.resources.CPUMetric
 import com.github.nikitavbv.servicemonitor.metric.resources.CPUMetricRepository
 import com.github.nikitavbv.servicemonitor.metric.resources.CPUUsageRepository
-import com.github.nikitavbv.servicemonitor.metric.resources.DeviceIO
 import com.github.nikitavbv.servicemonitor.metric.resources.DeviceIORepository
 import com.github.nikitavbv.servicemonitor.metric.resources.DiskUsageMetric
 import com.github.nikitavbv.servicemonitor.metric.resources.DiskUsageMetricRepository
@@ -88,7 +87,7 @@ class MetricController(
         val sessionFactory = entityManagerFactory.unwrap(SessionFactory::class.java)
         var result: MutableList<Map<String, Any?>>
         val pointsNeeded = points ?: DEFAULT_METRICS_POINTS
-        when(metric.type) {
+        when (metric.type) {
             MetricType.MEMORY.typeName -> {
                 val query = sessionFactory.openSession().createQuery("from MemoryMetric m WHERE m.metricBase.id = :id AND m.timestamp BETWEEN :fromDate AND :toDate")
                 query.setParameter("id", metric.id)

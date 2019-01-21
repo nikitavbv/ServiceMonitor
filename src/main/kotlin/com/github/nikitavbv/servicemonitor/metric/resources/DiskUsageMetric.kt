@@ -32,5 +32,4 @@ data class DiskUsageMetric(
             "timestamp" to timestamp
         )
     }
-
 }

@@ -33,9 +33,7 @@ data class Metric(
     val alerts: MutableList<Alert> = mutableListOf()
 ) {
 
-
     fun runAlertChecks(metricData: MutableMap<*, *>, alertRepository: AlertRepository) {
         alerts.forEach { it.runCheck(metricData, alertRepository) }
     }
-
 }

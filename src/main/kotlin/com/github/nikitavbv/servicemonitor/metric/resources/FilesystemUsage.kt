@@ -10,7 +10,7 @@ import javax.persistence.Id
 import javax.persistence.ManyToOne
 
 @Entity
-data class FilesystemUsage (
+data class FilesystemUsage(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
     @ManyToOne(cascade = [CascadeType.ALL], fetch = FetchType.LAZY)

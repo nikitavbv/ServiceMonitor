@@ -30,5 +30,4 @@ data class NginxMetric (
             "timestamp" to timestamp
         )
     }
-
 }

@@ -12,7 +12,7 @@ import javax.persistence.OneToMany
 import javax.persistence.OneToOne
 
 @Entity
-data class CPUMetric (
+data class CPUMetric(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
 
@@ -32,5 +32,4 @@ data class CPUMetric (
             "timestamp" to timestamp
         )
     }
-
 }

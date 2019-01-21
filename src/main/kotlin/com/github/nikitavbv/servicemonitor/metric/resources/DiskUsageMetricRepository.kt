@@ -2,4 +2,4 @@ package com.github.nikitavbv.servicemonitor.metric.resources
 
 import org.springframework.data.jpa.repository.JpaRepository
 
-interface DiskUsageMetricRepository: JpaRepository<DiskUsageMetric, Long>
+interface DiskUsageMetricRepository : JpaRepository<DiskUsageMetric, Long>

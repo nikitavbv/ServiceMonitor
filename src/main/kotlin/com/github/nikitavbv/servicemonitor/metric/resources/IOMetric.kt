@@ -32,5 +32,4 @@ data class IOMetric(
             "timestamp" to timestamp
         )
     }
-
 }
