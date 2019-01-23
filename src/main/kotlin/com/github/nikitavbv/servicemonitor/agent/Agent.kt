@@ -100,35 +100,17 @@ data class Agent(
 
     private fun getMetric(it: Metric, metricRepositories: MetricRepositories, lastEntryId: Long): AbstractMetric? {
         return when (it.type) {
-            MetricType.MEMORY.typeName -> {
-                metricRepositories.memoryMetricRepository.findById(lastEntryId).orElse(null)
-            }
-            MetricType.IO.typeName -> {
-                metricRepositories.ioMetricRepository.findById(lastEntryId).orElse(null)
-            }
-            MetricType.DISK_USAGE.typeName -> {
-                metricRepositories.diskUsageMetricRepository.findById(lastEntryId).orElse(null)
-            }
-            MetricType.CPU.typeName -> {
-                metricRepositories.cpuMetricRepository.findById(lastEntryId).orElse(null)
-            }
-            MetricType.UPTIME.typeName -> {
-                metricRepositories.uptimeMetricRepository.findById(lastEntryId).orElse(null)
-            }
-            MetricType.NETWORK.typeName -> {
-                metricRepositories.networkMetricRepository.findById(lastEntryId).orElse(null)
-            }
-            MetricType.DOCKER.typeName -> {
-                metricRepositories.dockerMetricRepository.findById(lastEntryId).orElse(null)
-            }
-            MetricType.NGINX.typeName -> {
-                metricRepositories.nginxMetricRepository.findById(lastEntryId).orElse(null)
-            }
-            MetricType.MYSQL.typeName -> {
-                metricRepositories.mysqlMetricRepository.findById(lastEntryId).orElse(null)
-            }
+            MetricType.MEMORY.typeName -> metricRepositories.memoryMetricRepository
+            MetricType.IO.typeName -> metricRepositories.ioMetricRepository
+            MetricType.DISK_USAGE.typeName -> metricRepositories.diskUsageMetricRepository
+            MetricType.CPU.typeName -> metricRepositories.cpuMetricRepository
+            MetricType.UPTIME.typeName -> metricRepositories.uptimeMetricRepository
+            MetricType.NETWORK.typeName -> metricRepositories.networkMetricRepository
+            MetricType.DOCKER.typeName -> metricRepositories.dockerMetricRepository
+            MetricType.NGINX.typeName -> metricRepositories.nginxMetricRepository
+            MetricType.MYSQL.typeName -> metricRepositories.mysqlMetricRepository
             else -> throw AssertionError("Unknown metric type: $it.type")
-        }
+        }.findById(lastEntryId).orElse(null)
     }
 
     fun addTags(tagsToAdd: List<String>) {
