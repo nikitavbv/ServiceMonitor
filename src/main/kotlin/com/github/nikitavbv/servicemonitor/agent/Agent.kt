@@ -1,6 +1,7 @@
 package com.github.nikitavbv.servicemonitor.agent
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.github.nikitavbv.servicemonitor.metric.AbstractMetric
 import com.github.nikitavbv.servicemonitor.metric.Metric
 import com.github.nikitavbv.servicemonitor.metric.MetricRepositories
 import com.github.nikitavbv.servicemonitor.metric.MetricType
@@ -94,6 +95,10 @@ data class Agent(
         metricRepositories: MetricRepositories,
         lastEntryId: Long
     ): Map<String, Any?>? {
+        return getMetric(it, metricRepositories, lastEntryId)?.asMap()
+    }
+
+    private fun getMetric(it: Metric, metricRepositories: MetricRepositories, lastEntryId: Long): AbstractMetric? {
         return when (it.type) {
             MetricType.MEMORY.typeName -> {
                 metricRepositories.memoryMetricRepository.findById(lastEntryId).orElse(null)
@@ -123,6 +128,26 @@ data class Agent(
                 metricRepositories.mysqlMetricRepository.findById(lastEntryId).orElse(null)
             }
             else -> throw AssertionError("Unknown metric type: $it.type")
-        }?.asMap()
+        }
+    }
+
+    fun addTags(tagsToAdd: List<String>) {
+        val tags = this.tags.split(",")
+            .filter { tagName -> tagName != "" }.toMutableList()
+        tagsToAdd.forEach { tag ->
+            if (!tags.contains(tag)) {
+                tags.add(tag)
+            }
+        }
+        this.tags = tags.joinToString(",")
+    }
+
+    fun removeTags(tagsToRemove: List<String>) {
+        val tags = this.tags.split(",")
+            .filter { tagName -> tagName != "" }.toMutableList()
+        tagsToRemove.forEach { tag ->
+            tags.remove(tag)
+        }
+        this.tags = tags.joinToString(",")
     }
 }

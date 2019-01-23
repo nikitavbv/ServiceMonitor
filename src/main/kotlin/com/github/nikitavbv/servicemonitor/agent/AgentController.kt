@@ -133,36 +133,13 @@ class AgentController(
         val project = agent.project ?: throw AssertionError("No project set for agent")
         if (!project.users.contains(user)) throw AccessDeniedException()
         updates.keys.forEach {
-            if (it != "token") {
-                when (it) {
-                    "name" -> agent.name = updates[it].toString()
-                    "tags.add" -> {
-                        val tags = agent.tags.split(",")
-                            .filter { tagName -> tagName != "" }.toMutableList()
-                        updates[it].toString().split(",").forEach { tag ->
-                            if (!tags.contains(tag)) {
-                                tags.add(tag)
-                            }
-                        }
-                        agent.tags = tags.joinToString(",")
-                    }
-                    "tags.remove" -> {
-                        val tags = agent.tags.split(",")
-                            .filter { tagName -> tagName != "" }.toMutableList()
-                        updates[it].toString().split(",").forEach { tag ->
-                            tags.remove(tag)
-                        }
-                        agent.tags = tags.joinToString(",")
-                    }
-                    "properties" -> {
-                        val properties = updates["properties"] as Map<*, *>
-                        properties.keys.forEach { propertyName ->
-                            val propertyValue = properties[propertyName].toString()
-                            agent.properties[propertyName.toString()] = propertyValue
-                        }
-                    }
-                    else -> throw UnknownParameterException(it)
-                }
+            when (it) {
+                "name" -> agent.name = updates[it].toString()
+                "tags.add" -> agent.addTags(updates[it].toString().split(","))
+                "tags.remove" -> agent.removeTags(updates[it].toString().split(","))
+                "properties" -> updateAgentProperties(agent, updates["it"] as Map<*, *>)
+                "token" -> {}
+                else -> throw UnknownParameterException(it)
             }
         }
         agentRepository.save(agent)

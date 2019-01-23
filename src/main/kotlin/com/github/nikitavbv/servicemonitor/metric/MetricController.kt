@@ -156,7 +156,12 @@ class MetricController(
     }
 
     fun addMetricRecord(metricBase: Metric, metricType: String, metricData: MutableMap<*, *>, mapper: ObjectMapper) {
-        metricBase.lastEntryID = when (metricType) {
+        metricBase.lastEntryID = saveMetric(metricBase, metricType, metricData, mapper)
+        metricRepository.save(metricBase)
+    }
+
+    fun saveMetric(metricBase: Metric, metricType: String, metricData: MutableMap<*, *>, mapper: ObjectMapper): Long? {
+        return when (metricType) {
             MetricType.MEMORY.typeName -> saveMemoryMetric(
                 mapper.convertValue(metricData, MemoryMetric::class.java),
                 metricBase,
@@ -209,8 +214,6 @@ class MetricController(
             )
             else -> throw InvalidParameterValueException(METRICS_BODY_KEY, "unknown metric type: $metricType")
         }
-
-        metricRepository.save(metricBase)
     }
 
     fun getRequestAPIToken(body: Map<String, Any>): String {
