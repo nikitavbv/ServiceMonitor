@@ -110,7 +110,7 @@ data class Agent(
             MetricType.NGINX.typeName -> metricRepositories.nginxMetricRepository
             MetricType.MYSQL.typeName -> metricRepositories.mysqlMetricRepository
             else -> throw AssertionError("Unknown metric type: $it.type")
-        }.findById(lastEntryId).orElse(null)
+        }.getOne(lastEntryId)
     }
 
     fun addTags(tagsToAdd: List<String>) {
