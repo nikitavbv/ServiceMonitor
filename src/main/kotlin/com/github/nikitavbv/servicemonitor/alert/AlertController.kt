@@ -45,7 +45,7 @@ class AlertController(
         val user = applicationUserRepository.findByUsername(req.remoteUser ?: throw AuthRequiredException())
         val agentID = (body["agentID"] ?: throw MissingParameterException("agentID")).toString().toLong()
         val agent = agentRepository.findById(agentID).orElseThrow { AgentNotFoundException() }
-        val project = agent.project ?: throw RuntimeException("No project set for agent")
+        val project = agent.project ?: throw AssertionError("No project set for agent")
         if (!project.users.contains(user)) throw AccessDeniedException()
         val metricID = (body["metricID"] ?: throw MissingParameterException("metricID")).toString().toLong()
         val metric = metricRepository.findById(metricID).orElseThrow { MetricNotFoundException() }
