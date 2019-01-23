@@ -38,7 +38,6 @@ import com.github.nikitavbv.servicemonitor.metric.resources.UptimeMetricReposito
 import com.github.nikitavbv.servicemonitor.user.ApplicationUserRepository
 import org.hibernate.SessionFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -150,67 +149,57 @@ class MetricController(
     }
 
     fun addMetricRecord(metricBase: Metric, metricType: String, metricData: MutableMap<*, *>, mapper: ObjectMapper) {
-        when (metricType) {
-            MetricType.MEMORY.typeName -> {
-                val metric = mapper.convertValue(metricData, MemoryMetric::class.java)
-                metric.metricBase = metricBase
-                memoryMetricRepository.save(metric)
-                metricBase.lastEntryID = metric.id
-            }
-            MetricType.IO.typeName -> {
-                val metric = mapper.convertValue(metricData, IOMetric::class.java)
-                metric.metricBase = metricBase
-                ioMetricRepository.save(metric)
-                metric.devices.forEach { it.metric = metric; deviceIORepository.save(it) }
-                metricBase.lastEntryID = metric.id
-                metricRepository.save(metricBase)
-            }
-            MetricType.DISK_USAGE.typeName -> {
-                val metric = mapper.convertValue(metricData, DiskUsageMetric::class.java)
-                metric.metricBase = metricBase
-                diskUsageMetricRepository.save(metric)
-                metric.filesystems.forEach { it.metric = metric; filesystemUsageRepository.save(it) }
-                metricBase.lastEntryID = metric.id
-            }
-            MetricType.CPU.typeName -> {
-                val metric = mapper.convertValue(metricData, CPUMetric::class.java)
-                metric.metricBase = metricBase
-                cpuMetricRepository.save(metric)
-                metric.cpus.forEach { it.metric = metric; cpuUsageRepository.save(it) }
-                metricBase.lastEntryID = metric.id
-            }
-            MetricType.UPTIME.typeName -> {
-                val metric = mapper.convertValue(metricData, UptimeMetric::class.java)
-                metric.metricBase = metricBase
-                uptimeMetricRepository.save(metric)
-                metricBase.lastEntryID = metric.id
-            }
-            MetricType.NETWORK.typeName -> {
-                val metric = mapper.convertValue(metricData, NetworkMetric::class.java)
-                metric.metricBase = metricBase
-                networkMetricRepository.save(metric)
-                metric.devices.forEach { it.metric = metric; networkDeviceDataRepository.save(it) }
-                metricBase.lastEntryID = metric.id
-            }
-            MetricType.DOCKER.typeName -> {
-                val metric = mapper.convertValue(metricData, DockerMetric::class.java)
-                metric.metricBase = metricBase
-                dockerMetricRepository.save(metric)
-                metric.containers.forEach { it.metric = metric; dockerContainerDataRepository.save(it) }
-                metricBase.lastEntryID = metric.id
-            }
-            MetricType.NGINX.typeName -> {
-                val metric = mapper.convertValue(metricData, NginxMetric::class.java)
-                metric.metricBase = metricBase
-                nginxMetricRepository.save(metric)
-                metricBase.lastEntryID = metric.id
-            }
-            MetricType.MYSQL.typeName -> {
-                val metric = mapper.convertValue(metricData, MysqlMetric::class.java)
-                metric.metricBase = metricBase
-                mysqlMetricRepository.save(metric)
-                metricBase.lastEntryID = metric.id
-            }
+        metricBase.lastEntryID = when (metricType) {
+            MetricType.MEMORY.typeName -> saveMemoryMetric(
+                mapper.convertValue(metricData, MemoryMetric::class.java),
+                metricBase,
+                memoryMetricRepository
+            )
+            MetricType.IO.typeName -> saveIOMetric(
+                mapper.convertValue(metricData, IOMetric::class.java),
+                metricBase,
+                ioMetricRepository,
+                deviceIORepository
+            )
+            MetricType.DISK_USAGE.typeName -> saveDiskUsageMetric(
+                mapper.convertValue(metricData, DiskUsageMetric::class.java),
+                metricBase,
+                diskUsageMetricRepository,
+                filesystemUsageRepository
+            )
+            MetricType.CPU.typeName -> saveCPUMetric(
+                mapper.convertValue(metricData, CPUMetric::class.java),
+                metricBase,
+                cpuMetricRepository,
+                cpuUsageRepository
+            )
+            MetricType.UPTIME.typeName -> saveUptimeMetric(
+                mapper.convertValue(metricData, UptimeMetric::class.java),
+                metricBase,
+                uptimeMetricRepository
+            )
+            MetricType.NETWORK.typeName -> saveNetworkMetric(
+                mapper.convertValue(metricData, NetworkMetric::class.java),
+                metricBase,
+                networkMetricRepository,
+                networkDeviceDataRepository
+            )
+            MetricType.DOCKER.typeName -> saveDockerMetric(
+                mapper.convertValue(metricData, DockerMetric::class.java),
+                metricBase,
+                dockerMetricRepository,
+                dockerContainerDataRepository
+            )
+            MetricType.NGINX.typeName -> saveNGINXMetric(
+                mapper.convertValue(metricData, NginxMetric::class.java),
+                metricBase,
+                nginxMetricRepository
+            )
+            MetricType.MYSQL.typeName -> saveMySQLMetric(
+                mapper.convertValue(metricData, MysqlMetric::class.java),
+                metricBase,
+                mysqlMetricRepository
+            )
             else -> throw InvalidParameterValueException(METRICS_BODY_KEY, "unknown metric type: $metricType")
         }
 
