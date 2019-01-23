@@ -178,18 +178,18 @@ class MetricController(
     }
 
     fun mapMetric(metricType: String, metricData: MutableMap<*, *>, mapper: ObjectMapper): AbstractMetric {
-        return when (metricType) {
-            MetricType.MEMORY.typeName -> mapper.convertValue(metricData, MemoryMetric::class.java)
-            MetricType.IO.typeName -> mapper.convertValue(metricData, IOMetric::class.java)
-            MetricType.DISK_USAGE.typeName -> mapper.convertValue(metricData, DiskUsageMetric::class.java)
-            MetricType.CPU.typeName -> mapper.convertValue(metricData, CPUMetric::class.java)
-            MetricType.UPTIME.typeName -> mapper.convertValue(metricData, UptimeMetric::class.java)
-            MetricType.NETWORK.typeName -> mapper.convertValue(metricData, NetworkMetric::class.java)
-            MetricType.DOCKER.typeName -> mapper.convertValue(metricData, DockerMetric::class.java)
-            MetricType.NGINX.typeName -> mapper.convertValue(metricData, NginxMetric::class.java)
-            MetricType.MYSQL.typeName -> mapper.convertValue(metricData, MysqlMetric::class.java)
+        return mapper.convertValue(metricData, when (metricType) {
+            MetricType.MEMORY.typeName -> MemoryMetric::class.java
+            MetricType.IO.typeName ->IOMetric::class.java
+            MetricType.DISK_USAGE.typeName -> DiskUsageMetric::class.java
+            MetricType.CPU.typeName -> CPUMetric::class.java
+            MetricType.UPTIME.typeName -> UptimeMetric::class.java
+            MetricType.NETWORK.typeName -> NetworkMetric::class.java
+            MetricType.DOCKER.typeName -> DockerMetric::class.java
+            MetricType.NGINX.typeName -> NginxMetric::class.java
+            MetricType.MYSQL.typeName -> MysqlMetric::class.java
             else -> throw InvalidParameterValueException(METRICS_BODY_KEY, "unknown metric type: $metricType")
-        }
+        })
     }
 
     fun findAgentByAPIToken(apiToken: String): Agent {

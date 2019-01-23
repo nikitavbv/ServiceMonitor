@@ -100,17 +100,20 @@ data class Agent(
 
     private fun getMetric(it: Metric, metricRepositories: MetricRepositories, lastEntryId: Long): AbstractMetric? {
         return when (it.type) {
-            MetricType.MEMORY.typeName -> metricRepositories.memoryMetricRepository
-            MetricType.IO.typeName -> metricRepositories.ioMetricRepository
-            MetricType.DISK_USAGE.typeName -> metricRepositories.diskUsageMetricRepository
-            MetricType.CPU.typeName -> metricRepositories.cpuMetricRepository
-            MetricType.UPTIME.typeName -> metricRepositories.uptimeMetricRepository
-            MetricType.NETWORK.typeName -> metricRepositories.networkMetricRepository
-            MetricType.DOCKER.typeName -> metricRepositories.dockerMetricRepository
-            MetricType.NGINX.typeName -> metricRepositories.nginxMetricRepository
-            MetricType.MYSQL.typeName -> metricRepositories.mysqlMetricRepository
+            MetricType.MEMORY.typeName -> getMemoryMetric(metricRepositories.memoryMetricRepository, lastEntryId)
+            MetricType.IO.typeName -> getIOMetric(metricRepositories.ioMetricRepository, lastEntryId)
+            MetricType.DISK_USAGE.typeName -> getDiskUsageMetric(
+                metricRepositories.diskUsageMetricRepository,
+                lastEntryId
+            )
+            MetricType.CPU.typeName -> getCPUMetric(metricRepositories.cpuMetricRepository, lastEntryId)
+            MetricType.UPTIME.typeName -> getUptimeMetric(metricRepositories.uptimeMetricRepository, lastEntryId)
+            MetricType.NETWORK.typeName -> getNetworkMetric(metricRepositories.networkMetricRepository, lastEntryId)
+            MetricType.DOCKER.typeName -> getDockerMetric(metricRepositories.dockerMetricRepository, lastEntryId)
+            MetricType.NGINX.typeName -> getNginxMetric(metricRepositories.nginxMetricRepository, lastEntryId)
+            MetricType.MYSQL.typeName -> getMysqlMetric(metricRepositories.mysqlMetricRepository, lastEntryId)
             else -> throw AssertionError("Unknown metric type: $it.type")
-        }.getOne(lastEntryId)
+        }
     }
 
     fun addTags(tagsToAdd: List<String>) {
