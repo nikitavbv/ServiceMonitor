@@ -6,6 +6,7 @@ import com.github.nikitavbv.servicemonitor.exceptions.AccessDeniedException
 import com.github.nikitavbv.servicemonitor.exceptions.AuthRequiredException
 import com.github.nikitavbv.servicemonitor.exceptions.MissingParameterException
 import com.github.nikitavbv.servicemonitor.exceptions.UnknownParameterException
+import com.github.nikitavbv.servicemonitor.getRequiredBodyParameter
 import com.github.nikitavbv.servicemonitor.metric.MetricRepositories
 import com.github.nikitavbv.servicemonitor.metric.resources.CPUMetricRepository
 import com.github.nikitavbv.servicemonitor.metric.resources.DiskUsageMetricRepository

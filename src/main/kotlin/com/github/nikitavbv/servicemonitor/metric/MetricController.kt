@@ -12,6 +12,7 @@ import com.github.nikitavbv.servicemonitor.exceptions.AuthRequiredException
 import com.github.nikitavbv.servicemonitor.exceptions.InvalidParameterValueException
 import com.github.nikitavbv.servicemonitor.exceptions.MissingAPIKeyException
 import com.github.nikitavbv.servicemonitor.exceptions.MissingParameterException
+import com.github.nikitavbv.servicemonitor.getRequestAPIToken
 import com.github.nikitavbv.servicemonitor.metric.resources.CPUMetric
 import com.github.nikitavbv.servicemonitor.metric.resources.CPUMetricRepository
 import com.github.nikitavbv.servicemonitor.metric.resources.CPUUsageRepository
@@ -156,18 +157,7 @@ class MetricController(
     }
 
     fun addMetricRecord(metricBase: Metric, metricType: String, metricData: MutableMap<*, *>, mapper: ObjectMapper) {
-        val metric = when (metricType) {
-            MetricType.MEMORY.typeName -> mapper.convertValue(metricData, MemoryMetric::class.java)
-            MetricType.IO.typeName -> mapper.convertValue(metricData, IOMetric::class.java)
-            MetricType.DISK_USAGE.typeName -> mapper.convertValue(metricData, DiskUsageMetric::class.java)
-            MetricType.CPU.typeName -> mapper.convertValue(metricData, CPUMetric::class.java)
-            MetricType.UPTIME.typeName -> mapper.convertValue(metricData, UptimeMetric::class.java)
-            MetricType.NETWORK.typeName -> mapper.convertValue(metricData, NetworkMetric::class.java)
-            MetricType.DOCKER.typeName -> mapper.convertValue(metricData, DockerMetric::class.java)
-            MetricType.NGINX.typeName -> mapper.convertValue(metricData, NginxMetric::class.java)
-            MetricType.MYSQL.typeName -> mapper.convertValue(metricData, MysqlMetric::class.java)
-            else -> throw InvalidParameterValueException(METRICS_BODY_KEY, "unknown metric type: $metricType")
-        }
+        val metric = mapMetric(metricType, metricData, mapper)
         metricBase.lastEntryID = metric.saveToRepository(metricBase, MetricRepositories(
             memoryMetricRepository,
             ioMetricRepository,
@@ -187,8 +177,19 @@ class MetricController(
         metricRepository.save(metricBase)
     }
 
-    fun getRequestAPIToken(body: Map<String, Any>): String {
-        return (body["token"] ?: throw MissingAPIKeyException()).toString()
+    fun mapMetric(metricType: String, metricData: MutableMap<*, *>, mapper: ObjectMapper): AbstractMetric {
+        return when (metricType) {
+            MetricType.MEMORY.typeName -> mapper.convertValue(metricData, MemoryMetric::class.java)
+            MetricType.IO.typeName -> mapper.convertValue(metricData, IOMetric::class.java)
+            MetricType.DISK_USAGE.typeName -> mapper.convertValue(metricData, DiskUsageMetric::class.java)
+            MetricType.CPU.typeName -> mapper.convertValue(metricData, CPUMetric::class.java)
+            MetricType.UPTIME.typeName -> mapper.convertValue(metricData, UptimeMetric::class.java)
+            MetricType.NETWORK.typeName -> mapper.convertValue(metricData, NetworkMetric::class.java)
+            MetricType.DOCKER.typeName -> mapper.convertValue(metricData, DockerMetric::class.java)
+            MetricType.NGINX.typeName -> mapper.convertValue(metricData, NginxMetric::class.java)
+            MetricType.MYSQL.typeName -> mapper.convertValue(metricData, MysqlMetric::class.java)
+            else -> throw InvalidParameterValueException(METRICS_BODY_KEY, "unknown metric type: $metricType")
+        }
     }
 
     fun findAgentByAPIToken(apiToken: String): Agent {
