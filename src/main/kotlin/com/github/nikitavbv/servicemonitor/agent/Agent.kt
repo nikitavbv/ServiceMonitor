@@ -2,6 +2,7 @@ package com.github.nikitavbv.servicemonitor.agent
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.github.nikitavbv.servicemonitor.metric.Metric
+import com.github.nikitavbv.servicemonitor.metric.MetricRepositories
 import com.github.nikitavbv.servicemonitor.metric.MetricType
 import com.github.nikitavbv.servicemonitor.metric.resources.CPUMetricRepository
 import com.github.nikitavbv.servicemonitor.metric.resources.DiskUsageMetricRepository
@@ -65,17 +66,7 @@ data class Agent(
         this.apiKey = UUID.randomUUID().toString()
     }
 
-    fun toMap(
-        memoryMetricRepository: MemoryMetricRepository,
-        ioMetricRepository: IOMetricRepository,
-        diskUsageMetricRepository: DiskUsageMetricRepository,
-        cpuMetricRepository: CPUMetricRepository,
-        uptimeMetricRepository: UptimeMetricRepository,
-        networkMetricRepository: NetworkMetricRepository,
-        dockerMetricRepository: DockerMetricRepository,
-        nginxMetricRepository: NginxMetricRepository,
-        mysqlMetricRepository: MysqlMetricRepository
-    ): Map<String, Any?> {
+    fun toMap(metricRepositories: MetricRepositories): Map<String, Any?> {
         var tagsArray = emptyArray<String>()
         if (tags != "") {
             tagsArray = tags.split(",").filter { it != "" }.toTypedArray()
@@ -88,31 +79,11 @@ data class Agent(
             "name" to name,
             "properties" to properties,
             "tags" to tagsArray,
-            "metrics" to getMetricsAsMap(
-                memoryMetricRepository,
-                ioMetricRepository,
-                diskUsageMetricRepository,
-                cpuMetricRepository,
-                uptimeMetricRepository,
-                networkMetricRepository,
-                dockerMetricRepository,
-                nginxMetricRepository,
-                mysqlMetricRepository
-            )
+            "metrics" to getMetricsAsMap(metricRepositories)
         )
     }
 
-    fun getMetricsAsMap(
-        memoryMetricRepository: MemoryMetricRepository,
-        ioMetricRepository: IOMetricRepository,
-        diskUsageMetricRepository: DiskUsageMetricRepository,
-        cpuMetricRepository: CPUMetricRepository,
-        uptimeMetricRepository: UptimeMetricRepository,
-        networkMetricRepository: NetworkMetricRepository,
-        dockerMetricRepository: DockerMetricRepository,
-        nginxMetricRepository: NginxMetricRepository,
-        mysqlMetricRepository: MysqlMetricRepository
-    ): MutableMap<String, Map<String, Any?>> {
+    fun getMetricsAsMap(metricRepositories: MetricRepositories): MutableMap<String, Map<String, Any?>> {
         val metricsData: MutableMap<String, Map<String, Any?>> = mutableMapOf()
         metrics.forEach {
             val tag = it.tag
@@ -120,55 +91,55 @@ data class Agent(
             if (tag != null && lastEntryId != null) {
                 when (it.type) {
                     MetricType.MEMORY.typeName -> {
-                        val memoryMetric = memoryMetricRepository.findById(lastEntryId)
+                        val memoryMetric = metricRepositories.memoryMetricRepository.findById(lastEntryId)
                         if (memoryMetric.isPresent) {
                             metricsData[tag] = memoryMetric.get().asMap()
                         }
                     }
                     MetricType.IO.typeName -> {
-                        val ioMetric = ioMetricRepository.findById(lastEntryId)
+                        val ioMetric = metricRepositories.ioMetricRepository.findById(lastEntryId)
                         if (ioMetric.isPresent) {
                             metricsData[tag] = ioMetric.get().asMap()
                         }
                     }
                     MetricType.DISK_USAGE.typeName -> {
-                        val diskUsageMetric = diskUsageMetricRepository.findById(lastEntryId)
+                        val diskUsageMetric = metricRepositories.diskUsageMetricRepository.findById(lastEntryId)
                         if (diskUsageMetric.isPresent) {
                             metricsData[tag] = diskUsageMetric.get().asMap()
                         }
                     }
                     MetricType.CPU.typeName -> {
-                        val cpuMetric = cpuMetricRepository.findById(lastEntryId)
+                        val cpuMetric = metricRepositories.cpuMetricRepository.findById(lastEntryId)
                         if (cpuMetric.isPresent) {
                             metricsData[tag] = cpuMetric.get().asMap()
                         }
                     }
                     MetricType.UPTIME.typeName -> {
-                        val uptimeMetric = uptimeMetricRepository.findById(lastEntryId)
+                        val uptimeMetric = metricRepositories.uptimeMetricRepository.findById(lastEntryId)
                         if (uptimeMetric.isPresent) {
                             metricsData[tag] = uptimeMetric.get().asMap()
                         }
                     }
                     MetricType.NETWORK.typeName -> {
-                        val networkMetric = networkMetricRepository.findById(lastEntryId)
+                        val networkMetric = metricRepositories.networkMetricRepository.findById(lastEntryId)
                         if (networkMetric.isPresent) {
                             metricsData[tag] = networkMetric.get().asMap()
                         }
                     }
                     MetricType.DOCKER.typeName -> {
-                        val dockerMetric = dockerMetricRepository.findById(lastEntryId)
+                        val dockerMetric = metricRepositories.dockerMetricRepository.findById(lastEntryId)
                         if (dockerMetric.isPresent) {
                             metricsData[tag] = dockerMetric.get().asMap()
                         }
                     }
                     MetricType.NGINX.typeName -> {
-                        val nginxMetric = nginxMetricRepository.findById(lastEntryId)
+                        val nginxMetric = metricRepositories.nginxMetricRepository.findById(lastEntryId)
                         if (nginxMetric.isPresent) {
                             metricsData[tag] = nginxMetric.get().asMap()
                         }
                     }
                     MetricType.MYSQL.typeName -> {
-                        val mysqlMetric = mysqlMetricRepository.findById(lastEntryId)
+                        val mysqlMetric = metricRepositories.mysqlMetricRepository.findById(lastEntryId)
                         if (mysqlMetric.isPresent) {
                             metricsData[tag] = mysqlMetric.get().asMap()
                         }

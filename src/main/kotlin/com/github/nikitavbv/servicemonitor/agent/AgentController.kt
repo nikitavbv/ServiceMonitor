@@ -6,6 +6,7 @@ import com.github.nikitavbv.servicemonitor.exceptions.AccessDeniedException
 import com.github.nikitavbv.servicemonitor.exceptions.AuthRequiredException
 import com.github.nikitavbv.servicemonitor.exceptions.MissingParameterException
 import com.github.nikitavbv.servicemonitor.exceptions.UnknownParameterException
+import com.github.nikitavbv.servicemonitor.metric.MetricRepositories
 import com.github.nikitavbv.servicemonitor.metric.resources.CPUMetricRepository
 import com.github.nikitavbv.servicemonitor.metric.resources.DiskUsageMetricRepository
 import com.github.nikitavbv.servicemonitor.metric.resources.DockerMetricRepository
@@ -110,17 +111,7 @@ class AgentController(
     @GetMapping()
     fun getAgentDetails(httpRequest: HttpServletRequest, token: String): Map<String, Any?> {
         val agent = agentRepository.findByApiKey(token) ?: throw AgentNotFoundException()
-        return agent.toMap(
-            memoryMetricRepository,
-            ioMetricRepository,
-            diskUsageMetricRepository,
-            cpuMetricRepository,
-            uptimeMetricRepository,
-            networkMetricRepository,
-            dockerMetricRepository,
-            nginxMetricRepository,
-            mysqlMetricRepository
-        )
+        return agent.toMap(getMetricRepositories())
     }
 
     @GetMapping("/{agentID}")
@@ -129,17 +120,7 @@ class AgentController(
         val agent = agentRepository.findById(agentID).orElseThrow { AgentNotFoundException() }
         val project = agent.project ?: throw RuntimeException("No project set for agent")
         if (!project.users.contains(user)) throw AccessDeniedException()
-        return agent.toMap(
-            memoryMetricRepository,
-            ioMetricRepository,
-            diskUsageMetricRepository,
-            cpuMetricRepository,
-            uptimeMetricRepository,
-            networkMetricRepository,
-            dockerMetricRepository,
-            nginxMetricRepository,
-            mysqlMetricRepository
-        )
+        return agent.toMap(getMetricRepositories())
     }
 
     @GetMapping("/all")
@@ -149,17 +130,7 @@ class AgentController(
         user.projects.forEach { project ->
             project.agents.forEach { agent ->
                 agents.add(
-                    agent.toMap(
-                        memoryMetricRepository,
-                        ioMetricRepository,
-                        diskUsageMetricRepository,
-                        cpuMetricRepository,
-                        uptimeMetricRepository,
-                        networkMetricRepository,
-                        dockerMetricRepository,
-                        nginxMetricRepository,
-                        mysqlMetricRepository
-                    )
+                    agent.toMap(getMetricRepositories())
                 )
             }
         }
@@ -264,5 +235,19 @@ class AgentController(
         project.agents.remove(agent)
         projectRepository.save(project)
         return StatusOKResponse()
+    }
+
+    fun getMetricRepositories(): MetricRepositories {
+        return MetricRepositories(
+            memoryMetricRepository,
+            ioMetricRepository,
+            diskUsageMetricRepository,
+            cpuMetricRepository,
+            uptimeMetricRepository,
+            networkMetricRepository,
+            dockerMetricRepository,
+            nginxMetricRepository,
+            mysqlMetricRepository
+        )
     }
 }
