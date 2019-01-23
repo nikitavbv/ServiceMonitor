@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletRequest
 
 @RestController
 @RequestMapping(ALERT_API)
-class AlertController(
+class AlertController (
     val alertRepository: AlertRepository,
     val applicationUserRepository: ApplicationUserRepository,
     val agentRepository: AgentRepository,
@@ -42,7 +42,7 @@ class AlertController(
     @PostMapping
     fun createAlert(req: HttpServletRequest, @RequestBody body: Map<String, Any?>): Map<String, Any?> {
         val user = getApplicationUserByHttpRequest(req)
-        val agentID =  getRequiredBodyParameter (body, "agentID").toString().toLong()
+        val agentID =  getRequiredBodyParameter(body, "agentID").toString().toLong()
         val agent = agentRepository.findById(agentID).orElseThrow { AgentNotFoundException() }
         val project = agent.project ?: throw AssertionError("No project set for agent")
         if (!project.users.contains(user)) throw AccessDeniedException()
@@ -51,7 +51,7 @@ class AlertController(
 
         val paramName = getRequiredBodyParameter(body, "paramName").toString()
         val condition = getRequiredBodyParameter(body, "condition").toString()
-        val conditionLevel = getRequiredBodyParameter(body,"conditionLevel").toString()
+        val conditionLevel = getRequiredBodyParameter(body, "conditionLevel").toString()
         val action = getRequiredBodyParameter(body, "alertAction").toString()
 
         val alert = Alert(
@@ -126,5 +126,4 @@ class AlertController(
     fun getApplicationUserByHttpRequest(req: HttpServletRequest): ApplicationUser {
         return applicationUserRepository.findByUsername(req.remoteUser ?: throw AuthRequiredException())
     }
-
 }

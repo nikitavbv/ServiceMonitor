@@ -67,5 +67,4 @@ class EndpointController(
                 agentRepository.save(it)
             }
     }
-
 }

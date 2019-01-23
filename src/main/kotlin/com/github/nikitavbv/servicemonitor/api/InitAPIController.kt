@@ -56,7 +56,7 @@ class InitAPIController(
                                     dockerMetricRepository,
                                     nginxMetricRepository,
                                     mysqlMetricRepository
-                                 )
+                                )
                             )
                         )
                     }
