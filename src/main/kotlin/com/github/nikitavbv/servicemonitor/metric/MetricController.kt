@@ -142,120 +142,78 @@ class MetricController(
             }
 
             addMetricRecord(metric, metricType, metricData, mapper)
-            
+
             metric.runAlertChecks(metricData, alertRepository)
         }
 
         return StatusOKResponse()
     }
 
-    fun addMetricRecord(metric: Metric, metricType: String, metricData: MutableMap<*, *>, mapper: ObjectMapper) {
+    fun addMetricRecord(metricBase: Metric, metricType: String, metricData: MutableMap<*, *>, mapper: ObjectMapper) {
         when (metricType) {
-            MetricType.MEMORY.typeName -> addMemoryRecord(
-                metric,
-                mapper.convertValue(metricData, MemoryMetric::class.java)
-            )
-            MetricType.IO.typeName -> addIORecord(
-                metric,
-                mapper.convertValue(metricData, IOMetric::class.java)
-            )
-            MetricType.DISK_USAGE.typeName -> addDiskUsageRecord(
-                metric,
-                mapper.convertValue(metricData, DiskUsageMetric::class.java)
-            )
-            MetricType.CPU.typeName -> addCPURecord(
-                metric,
-                mapper.convertValue(metricData, CPUMetric::class.java)
-            )
-            MetricType.UPTIME.typeName -> addUptimeRecord(
-                metric,
-                mapper.convertValue(metricData, UptimeMetric::class.java)
-            )
-            MetricType.NETWORK.typeName -> addNetworkRecord(
-                metric,
-                mapper.convertValue(metricData, NetworkMetric::class.java)
-            )
-            MetricType.DOCKER.typeName -> addDockerRecord(
-                metric,
-                mapper.convertValue(metricData, DockerMetric::class.java)
-            )
-            MetricType.NGINX.typeName -> addNginxRecord(
-                metric,
-                mapper.convertValue(metricData, NginxMetric::class.java)
-            )
-            MetricType.MYSQL.typeName -> addMysqlRecord(
-                metric,
-                mapper.convertValue(metricData, MysqlMetric::class.java)
-            )
+            MetricType.MEMORY.typeName -> {
+                val metric = mapper.convertValue(metricData, MemoryMetric::class.java)
+                metric.metricBase = metricBase
+                memoryMetricRepository.save(metric)
+                metricBase.lastEntryID = metric.id
+            }
+            MetricType.IO.typeName -> {
+                val metric = mapper.convertValue(metricData, IOMetric::class.java)
+                metric.metricBase = metricBase
+                ioMetricRepository.save(metric)
+                metric.devices.forEach { it.metric = metric; deviceIORepository.save(it) }
+                metricBase.lastEntryID = metric.id
+                metricRepository.save(metricBase)
+            }
+            MetricType.DISK_USAGE.typeName -> {
+                val metric = mapper.convertValue(metricData, DiskUsageMetric::class.java)
+                metric.metricBase = metricBase
+                diskUsageMetricRepository.save(metric)
+                metric.filesystems.forEach { it.metric = metric; filesystemUsageRepository.save(it) }
+                metricBase.lastEntryID = metric.id
+            }
+            MetricType.CPU.typeName -> {
+                val metric = mapper.convertValue(metricData, CPUMetric::class.java)
+                metric.metricBase = metricBase
+                cpuMetricRepository.save(metric)
+                metric.cpus.forEach { it.metric = metric; cpuUsageRepository.save(it) }
+                metricBase.lastEntryID = metric.id
+            }
+            MetricType.UPTIME.typeName -> {
+                val metric = mapper.convertValue(metricData, UptimeMetric::class.java)
+                metric.metricBase = metricBase
+                uptimeMetricRepository.save(metric)
+                metricBase.lastEntryID = metric.id
+            }
+            MetricType.NETWORK.typeName -> {
+                val metric = mapper.convertValue(metricData, NetworkMetric::class.java)
+                metric.metricBase = metricBase
+                networkMetricRepository.save(metric)
+                metric.devices.forEach { it.metric = metric; networkDeviceDataRepository.save(it) }
+                metricBase.lastEntryID = metric.id
+            }
+            MetricType.DOCKER.typeName -> {
+                val metric = mapper.convertValue(metricData, DockerMetric::class.java)
+                metric.metricBase = metricBase
+                dockerMetricRepository.save(metric)
+                metric.containers.forEach { it.metric = metric; dockerContainerDataRepository.save(it) }
+                metricBase.lastEntryID = metric.id
+            }
+            MetricType.NGINX.typeName -> {
+                val metric = mapper.convertValue(metricData, NginxMetric::class.java)
+                metric.metricBase = metricBase
+                nginxMetricRepository.save(metric)
+                metricBase.lastEntryID = metric.id
+            }
+            MetricType.MYSQL.typeName -> {
+                val metric = mapper.convertValue(metricData, MysqlMetric::class.java)
+                metric.metricBase = metricBase
+                mysqlMetricRepository.save(metric)
+                metricBase.lastEntryID = metric.id
+            }
             else -> throw InvalidParameterValueException(METRICS_BODY_KEY, "unknown metric type: $metricType")
         }
-    }
 
-    fun addMemoryRecord(metricBase: Metric, metric: MemoryMetric) {
-        metric.metricBase = metricBase
-        memoryMetricRepository.save(metric)
-        metricBase.lastEntryID = metric.id
-        metricRepository.save(metricBase)
-    }
-
-    fun addIORecord(metricBase: Metric, metric: IOMetric) {
-        metric.metricBase = metricBase
-        ioMetricRepository.save(metric)
-        metric.devices.forEach { it.metric = metric; deviceIORepository.save(it) }
-        metricBase.lastEntryID = metric.id
-        metricRepository.save(metricBase)
-    }
-
-    fun addDiskUsageRecord(metricBase: Metric, metric: DiskUsageMetric) {
-        metric.metricBase = metricBase
-        diskUsageMetricRepository.save(metric)
-        metric.filesystems.forEach { it.metric = metric; filesystemUsageRepository.save(it) }
-        metricBase.lastEntryID = metric.id
-        metricRepository.save(metricBase)
-    }
-
-    fun addCPURecord(metricBase: Metric, metric: CPUMetric) {
-        metric.metricBase = metricBase
-        cpuMetricRepository.save(metric)
-        metric.cpus.forEach { it.metric = metric; cpuUsageRepository.save(it) }
-        metricBase.lastEntryID = metric.id
-        metricRepository.save(metricBase)
-    }
-
-    fun addUptimeRecord(metricBase: Metric, metric: UptimeMetric) {
-        metric.metricBase = metricBase
-        uptimeMetricRepository.save(metric)
-        metricBase.lastEntryID = metric.id
-        metricRepository.save(metricBase)
-    }
-
-    fun addNetworkRecord(metricBase: Metric, metric: NetworkMetric) {
-        metric.metricBase = metricBase
-        networkMetricRepository.save(metric)
-        metric.devices.forEach { it.metric = metric; networkDeviceDataRepository.save(it) }
-        metricBase.lastEntryID = metric.id
-        metricRepository.save(metricBase)
-    }
-
-    fun addDockerRecord(metricBase: Metric, metric: DockerMetric) {
-        metric.metricBase = metricBase
-        dockerMetricRepository.save(metric)
-        metric.containers.forEach { it.metric = metric; dockerContainerDataRepository.save(it) }
-        metricBase.lastEntryID = metric.id
-        metricRepository.save(metricBase)
-    }
-
-    fun addNginxRecord(metricBase: Metric, metric: NginxMetric) {
-        metric.metricBase = metricBase
-        nginxMetricRepository.save(metric)
-        metricBase.lastEntryID = metric.id
-        metricRepository.save(metricBase)
-    }
-
-    fun addMysqlRecord(metricBase: Metric, metric: MysqlMetric) {
-        metric.metricBase = metricBase
-        mysqlMetricRepository.save(metric)
-        metricBase.lastEntryID = metric.id
         metricRepository.save(metricBase)
     }
 
