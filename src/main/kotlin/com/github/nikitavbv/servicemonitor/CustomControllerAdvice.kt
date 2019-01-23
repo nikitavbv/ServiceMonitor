@@ -1,17 +1,11 @@
 package com.github.nikitavbv.servicemonitor
 
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
-import com.github.nikitavbv.servicemonitor.agent.AgentNotFoundException
 import com.github.nikitavbv.servicemonitor.exceptions.AuthRequiredException
 import com.github.nikitavbv.servicemonitor.exceptions.InvalidParameterValueException
 import com.github.nikitavbv.servicemonitor.exceptions.MissingAPIKeyException
 import com.github.nikitavbv.servicemonitor.exceptions.MissingParameterException
 import com.github.nikitavbv.servicemonitor.exceptions.UnknownParameterException
-import com.github.nikitavbv.servicemonitor.exceptions.UserNotFoundException
-import com.github.nikitavbv.servicemonitor.metric.MetricNotFoundException
-import com.github.nikitavbv.servicemonitor.project.ProjectNotFoundException
-import com.github.nikitavbv.servicemonitor.security.PermissionDeniedException
-import io.jsonwebtoken.security.SignatureException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.HttpMessageNotReadableException
