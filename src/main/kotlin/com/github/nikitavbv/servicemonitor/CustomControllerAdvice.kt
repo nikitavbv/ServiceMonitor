@@ -57,19 +57,19 @@ class CustomControllerAdvice {
             "error" to "illegal_parameter"
         ))
 
-        if (exceptionMessage.startsWith("Parameter specified as non-null is null: ")) {
+        return if (exceptionMessage.startsWith("Parameter specified as non-null is null: ")) {
             val parameterName = exceptionMessage.substring(
                 exceptionMessage.indexOf(", parameter ") + ", parameter ".length
             )
-            return ResponseEntity.badRequest().body(mapOf(
+            ResponseEntity.badRequest().body(mapOf(
                 "error" to "missing_parameter",
                 "missing_parameter" to parameterName
             ))
+        } else {
+            ResponseEntity.badRequest().body(mapOf(
+                "error" to "illegal_parameter"
+            ))
         }
-
-        return ResponseEntity.badRequest().body(mapOf(
-            "error" to "illegal_parameter"
-        ))
     }
 
     @ExceptionHandler(MissingAPIKeyException::class)

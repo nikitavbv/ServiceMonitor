@@ -35,6 +35,7 @@ import com.github.nikitavbv.servicemonitor.metric.resources.NginxMetric
 import com.github.nikitavbv.servicemonitor.metric.resources.NginxMetricRepository
 import com.github.nikitavbv.servicemonitor.metric.resources.UptimeMetric
 import com.github.nikitavbv.servicemonitor.metric.resources.UptimeMetricRepository
+import com.github.nikitavbv.servicemonitor.user.ApplicationUser
 import com.github.nikitavbv.servicemonitor.user.ApplicationUserRepository
 import org.hibernate.SessionFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -78,8 +79,14 @@ class MetricController(
     lateinit var entityManagerFactory: EntityManagerFactory
 
     @GetMapping("/{metricID}")
-    fun getData(req: HttpServletRequest, @PathVariable metricID: Long, from: Long, to: Long, points: Long?): Map<String, Any?> {
-        val user = applicationUserRepository.findByUsername(req.remoteUser ?: throw AuthRequiredException())
+    fun getData(
+        req: HttpServletRequest,
+        @PathVariable metricID: Long,
+        from: Long,
+        to: Long,
+        points: Long?
+    ): Map<String, Any?> {
+        val user = getApplicationUserByHttpRequest(req)
         val metric = metricRepository.findById(metricID).orElseThrow { MetricNotFoundException() }
         val agent = metric.agent ?: throw AssertionError("No agent set for metric")
         val project = agent.project ?: throw AssertionError("No project set for agent")
@@ -226,5 +233,9 @@ class MetricController(
     fun getMetricStringField(metricData: MutableMap<*, *>, metricsParameterName: String, fieldName: String): String {
         return metricData[fieldName] as? String
             ?: throw InvalidParameterValueException(metricsParameterName, "non-string metric $fieldName")
+    }
+
+    fun getApplicationUserByHttpRequest(req: HttpServletRequest): ApplicationUser {
+        return applicationUserRepository.findByUsername(req.remoteUser ?: throw AuthRequiredException())
     }
 }

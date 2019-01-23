@@ -38,6 +38,8 @@ class JWTAuthorizationFilter(
 
     private fun getAuthentication(request: HttpServletRequest): Authentication? {
         val token = request.getHeader(HEADER_STRING)
+        var authentication: Authentication? = null
+
         if (token != null) {
             var secret: String
             try {
@@ -56,12 +58,15 @@ class JWTAuthorizationFilter(
                     .subject
 
                 if (user != null) {
-                    return UsernamePasswordAuthenticationToken(user, null, emptyList<GrantedAuthority>())
+                    authentication = UsernamePasswordAuthenticationToken(
+                        user, null, emptyList<GrantedAuthority>()
+                    )
                 }
             } catch (e: SignatureException) {
-                return null
+                // ignore
             }
         }
-        return null
+
+        return authentication
     }
 }

@@ -89,7 +89,11 @@ data class Agent(
         return metricsData
     }
 
-    private fun getMetricMap(it: Metric, metricRepositories: MetricRepositories, lastEntryId: Long): Map<String, Any?>? {
+    private fun getMetricMap(
+        it: Metric,
+        metricRepositories: MetricRepositories,
+        lastEntryId: Long
+    ): Map<String, Any?>? {
         return when (it.type) {
             MetricType.MEMORY.typeName -> {
                 metricRepositories.memoryMetricRepository.findById(lastEntryId).orElse(null)

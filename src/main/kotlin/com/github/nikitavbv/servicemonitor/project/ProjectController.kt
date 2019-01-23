@@ -103,7 +103,11 @@ class ProjectController(
     }
 
     @PutMapping("/{projectID}")
-    fun updateProject(httpRequest: HttpServletRequest, @PathVariable projectID: Long, @RequestBody updates: Map<String, Any>): StatusOKResponse {
+    fun updateProject(
+        httpRequest: HttpServletRequest,
+        @PathVariable projectID: Long,
+        @RequestBody updates: Map<String, Any>
+    ): StatusOKResponse {
         val user = applicationUserRepository.findByUsername(httpRequest.remoteUser)
         val project = user.projects.find { it.id == projectID } ?: throw ProjectNotFoundException()
         updates.keys.forEach {
@@ -165,7 +169,11 @@ class ProjectController(
     }
 
     @PutMapping("/{projectID}/starMetric")
-    fun starMetric(httpRequest: HttpServletRequest, @PathVariable projectID: Long, @RequestBody body: Map<String, Any?>): StatusOKResponse {
+    fun starMetric(
+        httpRequest: HttpServletRequest,
+        @PathVariable projectID: Long,
+        @RequestBody body: Map<String, Any?>
+    ): StatusOKResponse {
         val user = applicationUserRepository.findByUsername(httpRequest.remoteUser)
         val project = user.projects.find { it.id == projectID } ?: throw ProjectNotFoundException()
         val metricID = (body["metricID"] ?: throw MissingParameterException("metricID")).toString().toLong()
@@ -177,7 +185,11 @@ class ProjectController(
     }
 
     @PutMapping("/{projectID}/unstarMetric")
-    fun unstarMetric(httpRequest: HttpServletRequest, @PathVariable projectID: Long, @RequestBody body: Map<String, Any?>): StatusOKResponse {
+    fun unstarMetric(
+        httpRequest: HttpServletRequest,
+        @PathVariable projectID: Long,
+        @RequestBody body: Map<String, Any?>
+    ): StatusOKResponse {
         val user = applicationUserRepository.findByUsername(httpRequest.remoteUser)
         val project = user.projects.find { it.id == projectID } ?: throw ProjectNotFoundException()
         val metricID = (body["metricID"] ?: throw MissingParameterException("metricID")).toString().toLong()

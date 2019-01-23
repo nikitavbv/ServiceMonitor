@@ -40,20 +40,15 @@ data class Alert(
 
         if (state && !actionExecuted) {
             checkTimeAndRunAction(state, alertRepository)
-            return
-        }
+        } else if (state != triggered) {
+            if (state) {
+                triggeredAt = Date()
+                actionExecuted = false
+            }
 
-        if (state == triggered) {
-            return
+            triggered = state
+            alertRepository.save(this)
         }
-
-        if (state) {
-            triggeredAt = Date()
-            actionExecuted = false
-        }
-
-        triggered = state
-        alertRepository.save(this)
     }
 
     private fun checkTimeAndRunAction(state: Boolean, alertRepository: AlertRepository) {
@@ -65,13 +60,10 @@ data class Alert(
                 actionExecuted = true
                 triggered = state
                 alertRepository.save(this)
-            } else {
-                return
             }
         } else {
             triggeredAt = Date()
             alertRepository.save(this)
-            return
         }
     }
 
@@ -108,11 +100,11 @@ data class Alert(
             println("Metric map does not contain key: $keyToGet")
             return null
         }
-        if (action == null) {
-            return dataValue
-        }
 
-        return applyAction(dataValue, action)
+        return when (action) {
+            null -> dataValue
+            else -> applyAction(dataValue, action)
+        }
     }
 
     private fun applyAction(dataValue: Any, action: String): Any? {

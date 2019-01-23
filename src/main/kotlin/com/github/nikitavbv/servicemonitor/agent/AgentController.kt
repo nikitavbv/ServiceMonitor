@@ -18,6 +18,7 @@ import com.github.nikitavbv.servicemonitor.metric.resources.NginxMetricRepositor
 import com.github.nikitavbv.servicemonitor.metric.resources.UptimeMetricRepository
 import com.github.nikitavbv.servicemonitor.project.ProjectNotFoundException
 import com.github.nikitavbv.servicemonitor.project.ProjectRepository
+import com.github.nikitavbv.servicemonitor.user.ApplicationUser
 import com.github.nikitavbv.servicemonitor.user.ApplicationUserRepository
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -55,7 +56,7 @@ class AgentController(
 
     @GetMapping("/{agentID}")
     fun getAgentDetailsByID(req: HttpServletRequest, @PathVariable agentID: Long): Map<String, Any?> {
-        val user = applicationUserRepository.findByUsername(req.remoteUser ?: throw AuthRequiredException())
+        val user = getApplicationUserByHttpRequest(req)
         val agent = agentRepository.findById(agentID).orElseThrow { AgentNotFoundException() }
         val project = agent.project ?: throw AssertionError("No project set for agent")
         if (!project.users.contains(user)) throw AccessDeniedException()
@@ -64,7 +65,7 @@ class AgentController(
 
     @GetMapping("/all")
     fun getAllAgents(httpRequest: HttpServletRequest): Map<String, Any?> {
-        val user = applicationUserRepository.findByUsername(httpRequest.remoteUser ?: throw AuthRequiredException())
+        val user = getApplicationUserByHttpRequest(httpRequest)
         val agents: MutableList<Map<String, Any?>> = mutableListOf()
         user.projects.forEach { project ->
             project.agents.forEach { agent ->
@@ -122,8 +123,12 @@ class AgentController(
     }
 
     @PutMapping("/{agentID}")
-    fun updateAgent(req: HttpServletRequest, @RequestBody updates: Map<String, Any>, @PathVariable agentID: Long): StatusOKResponse {
-        val user = applicationUserRepository.findByUsername(req.remoteUser ?: throw AuthRequiredException())
+    fun updateAgent(
+        req: HttpServletRequest,
+        @RequestBody updates: Map<String, Any>,
+        @PathVariable agentID: Long
+    ): StatusOKResponse {
+        val user = getApplicationUserByHttpRequest(req)
         val agent = agentRepository.findById(agentID).orElseThrow { AgentNotFoundException() }
         val project = agent.project ?: throw AssertionError("No project set for agent")
         if (!project.users.contains(user)) throw AccessDeniedException()
@@ -166,7 +171,7 @@ class AgentController(
 
     @DeleteMapping("/{agentID}")
     fun deleteAgent(req: HttpServletRequest, @PathVariable agentID: Long): StatusOKResponse {
-        val user = applicationUserRepository.findByUsername(req.remoteUser ?: throw AuthRequiredException())
+        val user = getApplicationUserByHttpRequest(req)
         val agent = agentRepository.findById(agentID).orElseThrow { AgentNotFoundException() }
         val project = agent.project ?: throw AssertionError("No project set for agent")
         if (!project.users.contains(user)) throw AccessDeniedException()
@@ -188,5 +193,9 @@ class AgentController(
             nginxMetricRepository,
             mysqlMetricRepository
         )
+    }
+
+    fun getApplicationUserByHttpRequest(req: HttpServletRequest): ApplicationUser {
+        return applicationUserRepository.findByUsername(req.remoteUser ?: throw AuthRequiredException())
     }
 }

@@ -34,26 +34,25 @@ class AlertController(
 
     @GetMapping
     fun getAllAlerts(req: HttpServletRequest): Map<String, Any?> {
-        val user = applicationUserRepository.findByUsername(req.remoteUser ?: throw AuthRequiredException())
         return mapOf(
-            "alerts" to getAlertsForUser(user)
+            "alerts" to getAlertsForUser(getApplicationUserByHttpRequest(req))
         )
     }
 
     @PostMapping
     fun createAlert(req: HttpServletRequest, @RequestBody body: Map<String, Any?>): Map<String, Any?> {
-        val user = applicationUserRepository.findByUsername(req.remoteUser ?: throw AuthRequiredException())
-        val agentID = (body["agentID"] ?: throw MissingParameterException("agentID")).toString().toLong()
+        val user = getApplicationUserByHttpRequest(req)
+        val agentID =  getRequiredBodyParameter (body, "agentID").toString().toLong()
         val agent = agentRepository.findById(agentID).orElseThrow { AgentNotFoundException() }
         val project = agent.project ?: throw AssertionError("No project set for agent")
         if (!project.users.contains(user)) throw AccessDeniedException()
-        val metricID = (body["metricID"] ?: throw MissingParameterException("metricID")).toString().toLong()
+        val metricID = getRequiredBodyParameter(body, "metricID").toString().toLong()
         val metric = metricRepository.findById(metricID).orElseThrow { MetricNotFoundException() }
 
-        val paramName = (body["paramName"] ?: throw MissingParameterException("metricName")).toString()
-        val condition = (body["condition"] ?: throw MissingParameterException("condition")).toString()
-        val conditionLevel = (body["conditionLevel"] ?: throw MissingParameterException("conditionLevel")).toString()
-        val action = (body["alertAction"] ?: throw MissingParameterException("action")).toString()
+        val paramName = getRequiredBodyParameter(body, "paramName").toString()
+        val condition = getRequiredBodyParameter(body, "condition").toString()
+        val conditionLevel = getRequiredBodyParameter(body,"conditionLevel").toString()
+        val action = getRequiredBodyParameter(body, "alertAction").toString()
 
         val alert = Alert(
             metric = metric,
@@ -74,7 +73,7 @@ class AlertController(
 
     @DeleteMapping("/{alertID}")
     fun deleteAlert(req: HttpServletRequest, @PathVariable alertID: Long): StatusOKResponse {
-        val user = applicationUserRepository.findByUsername(req.remoteUser ?: throw AuthRequiredException())
+        val user = getApplicationUserByHttpRequest(req)
         val alert = alertRepository.findById(alertID).orElseThrow { AlertNotFoundException() }
         val agent = alert.metric.agent ?: throw AssertionError("Metric has no agent set")
         val project = agent.project ?: throw AssertionError("Agent has no project set")
@@ -119,4 +118,13 @@ class AlertController(
             )
         }.toList()
     }
+
+    fun getRequiredBodyParameter(body: Map<String, Any?>, key: String): Any {
+        return body[key] ?: throw MissingParameterException(key)
+    }
+
+    fun getApplicationUserByHttpRequest(req: HttpServletRequest): ApplicationUser {
+        return applicationUserRepository.findByUsername(req.remoteUser ?: throw AuthRequiredException())
+    }
+
 }
