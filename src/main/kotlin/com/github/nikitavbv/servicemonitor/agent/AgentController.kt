@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import java.lang.RuntimeException
 import javax.servlet.http.HttpServletRequest
 
 @RestController
@@ -58,7 +57,7 @@ class AgentController(
     fun getAgentDetailsByID(req: HttpServletRequest, @PathVariable agentID: Long): Map<String, Any?> {
         val user = applicationUserRepository.findByUsername(req.remoteUser ?: throw AuthRequiredException())
         val agent = agentRepository.findById(agentID).orElseThrow { AgentNotFoundException() }
-        val project = agent.project ?: throw RuntimeException("No project set for agent")
+        val project = agent.project ?: throw AssertionError("No project set for agent")
         if (!project.users.contains(user)) throw AccessDeniedException()
         return agent.toMap(getMetricRepositories())
     }
@@ -126,7 +125,7 @@ class AgentController(
     fun updateAgent(req: HttpServletRequest, @RequestBody updates: Map<String, Any>, @PathVariable agentID: Long): StatusOKResponse {
         val user = applicationUserRepository.findByUsername(req.remoteUser ?: throw AuthRequiredException())
         val agent = agentRepository.findById(agentID).orElseThrow { AgentNotFoundException() }
-        val project = agent.project ?: throw RuntimeException("No project set for agent")
+        val project = agent.project ?: throw AssertionError("No project set for agent")
         if (!project.users.contains(user)) throw AccessDeniedException()
         updates.keys.forEach {
             if (it != "token") {
@@ -169,7 +168,7 @@ class AgentController(
     fun deleteAgent(req: HttpServletRequest, @PathVariable agentID: Long): StatusOKResponse {
         val user = applicationUserRepository.findByUsername(req.remoteUser ?: throw AuthRequiredException())
         val agent = agentRepository.findById(agentID).orElseThrow { AgentNotFoundException() }
-        val project = agent.project ?: throw RuntimeException("No project set for agent")
+        val project = agent.project ?: throw AssertionError("No project set for agent")
         if (!project.users.contains(user)) throw AccessDeniedException()
         agentRepository.delete(agent)
         project.agents.remove(agent)

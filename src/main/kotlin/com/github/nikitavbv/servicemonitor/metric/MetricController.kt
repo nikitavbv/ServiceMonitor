@@ -81,8 +81,8 @@ class MetricController(
     fun getData(req: HttpServletRequest, @PathVariable metricID: Long, from: Long, to: Long, points: Long?): Map<String, Any?> {
         val user = applicationUserRepository.findByUsername(req.remoteUser ?: throw AuthRequiredException())
         val metric = metricRepository.findById(metricID).orElseThrow { MetricNotFoundException() }
-        val agent = metric.agent ?: throw RuntimeException("No agent set for metric")
-        val project = agent.project ?: throw RuntimeException("No project set for agent")
+        val agent = metric.agent ?: throw AssertionError("No agent set for metric")
+        val project = agent.project ?: throw AssertionError("No project set for agent")
         if (!project.users.contains(user)) throw AccessDeniedException()
         val sessionFactory = entityManagerFactory.unwrap(SessionFactory::class.java)
         var result: MutableList<Map<String, Any?>>

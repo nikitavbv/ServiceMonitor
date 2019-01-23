@@ -1,21 +1,10 @@
 package com.github.nikitavbv.servicemonitor.agent
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import com.github.nikitavbv.servicemonitor.metric.AbstractMetric
 import com.github.nikitavbv.servicemonitor.metric.Metric
 import com.github.nikitavbv.servicemonitor.metric.MetricRepositories
 import com.github.nikitavbv.servicemonitor.metric.MetricType
-import com.github.nikitavbv.servicemonitor.metric.resources.CPUMetricRepository
-import com.github.nikitavbv.servicemonitor.metric.resources.DiskUsageMetricRepository
-import com.github.nikitavbv.servicemonitor.metric.resources.DockerMetricRepository
-import com.github.nikitavbv.servicemonitor.metric.resources.IOMetricRepository
-import com.github.nikitavbv.servicemonitor.metric.resources.MemoryMetricRepository
-import com.github.nikitavbv.servicemonitor.metric.resources.MysqlMetricRepository
-import com.github.nikitavbv.servicemonitor.metric.resources.NetworkMetricRepository
-import com.github.nikitavbv.servicemonitor.metric.resources.NginxMetricRepository
-import com.github.nikitavbv.servicemonitor.metric.resources.UptimeMetricRepository
 import com.github.nikitavbv.servicemonitor.project.Project
-import java.util.Optional
 import java.util.UUID
 import javax.persistence.CascadeType
 import javax.persistence.Column
@@ -129,7 +118,7 @@ data class Agent(
             MetricType.MYSQL.typeName -> {
                 metricRepositories.mysqlMetricRepository.findById(lastEntryId).orElse(null)
             }
-            else -> throw RuntimeException("Unknown metric type: $it.type")
+            else -> throw AssertionError("Unknown metric type: $it.type")
         }?.asMap()
     }
 }

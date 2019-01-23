@@ -1,13 +1,13 @@
 package com.github.nikitavbv.servicemonitor.endpoint
 
 import com.github.nikitavbv.servicemonitor.agent.AgentRepository
+import org.apache.http.HttpException
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.impl.client.HttpClients
 import org.springframework.http.HttpStatus
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.web.bind.annotation.RestController
-import java.lang.Exception
 
 @RestController
 class EndpointController(
@@ -44,7 +44,7 @@ class EndpointController(
                         it.properties["totalErrors"] = ((it.properties["totalErrors"])!!.toLong() + 1).toString()
                     }
                     response?.close()
-                } catch (e: Exception) {
+                } catch (e: HttpException) {
                     totalTime = System.currentTimeMillis() - startedAt
                     it.properties["totalErrors"] = ((it.properties["totalErrors"])!!.toLong() + 1).toString()
                 }
