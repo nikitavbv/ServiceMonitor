@@ -1,6 +1,7 @@
 package com.github.nikitavbv.servicemonitor.agent
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.github.nikitavbv.servicemonitor.metric.AbstractMetric
 import com.github.nikitavbv.servicemonitor.metric.Metric
 import com.github.nikitavbv.servicemonitor.metric.MetricRepositories
 import com.github.nikitavbv.servicemonitor.metric.MetricType
@@ -14,6 +15,7 @@ import com.github.nikitavbv.servicemonitor.metric.resources.NetworkMetricReposit
 import com.github.nikitavbv.servicemonitor.metric.resources.NginxMetricRepository
 import com.github.nikitavbv.servicemonitor.metric.resources.UptimeMetricRepository
 import com.github.nikitavbv.servicemonitor.project.Project
+import java.util.Optional
 import java.util.UUID
 import javax.persistence.CascadeType
 import javax.persistence.Column
@@ -101,69 +103,33 @@ data class Agent(
     private fun getMetricMap(it: Metric, metricRepositories: MetricRepositories, lastEntryId: Long): Map<String, Any?>? {
         return when (it.type) {
             MetricType.MEMORY.typeName -> {
-                val memoryMetric = metricRepositories.memoryMetricRepository.findById(lastEntryId)
-                if (memoryMetric.isPresent) {
-                    memoryMetric.get().asMap()
-                }
-                null
+                metricRepositories.memoryMetricRepository.findById(lastEntryId).orElse(null)
             }
             MetricType.IO.typeName -> {
-                val ioMetric = metricRepositories.ioMetricRepository.findById(lastEntryId)
-                if (ioMetric.isPresent) {
-                    ioMetric.get().asMap()
-                }
-                null
+                metricRepositories.ioMetricRepository.findById(lastEntryId).orElse(null)
             }
             MetricType.DISK_USAGE.typeName -> {
-                val diskUsageMetric = metricRepositories.diskUsageMetricRepository.findById(lastEntryId)
-                if (diskUsageMetric.isPresent) {
-                    diskUsageMetric.get().asMap()
-                }
-                null
+                metricRepositories.diskUsageMetricRepository.findById(lastEntryId).orElse(null)
             }
             MetricType.CPU.typeName -> {
-                val cpuMetric = metricRepositories.cpuMetricRepository.findById(lastEntryId)
-                if (cpuMetric.isPresent) {
-                    cpuMetric.get().asMap()
-                }
-                null
+                metricRepositories.cpuMetricRepository.findById(lastEntryId).orElse(null)
             }
             MetricType.UPTIME.typeName -> {
-                val uptimeMetric = metricRepositories.uptimeMetricRepository.findById(lastEntryId)
-                if (uptimeMetric.isPresent) {
-                    uptimeMetric.get().asMap()
-                }
-                null
+                metricRepositories.uptimeMetricRepository.findById(lastEntryId).orElse(null)
             }
             MetricType.NETWORK.typeName -> {
-                val networkMetric = metricRepositories.networkMetricRepository.findById(lastEntryId)
-                if (networkMetric.isPresent) {
-                    networkMetric.get().asMap()
-                }
-                null
+                metricRepositories.networkMetricRepository.findById(lastEntryId).orElse(null)
             }
             MetricType.DOCKER.typeName -> {
-                val dockerMetric = metricRepositories.dockerMetricRepository.findById(lastEntryId)
-                if (dockerMetric.isPresent) {
-                    dockerMetric.get().asMap()
-                }
-                null
+                metricRepositories.dockerMetricRepository.findById(lastEntryId).orElse(null)
             }
             MetricType.NGINX.typeName -> {
-                val nginxMetric = metricRepositories.nginxMetricRepository.findById(lastEntryId)
-                if (nginxMetric.isPresent) {
-                    nginxMetric.get().asMap()
-                }
-                null
+                metricRepositories.nginxMetricRepository.findById(lastEntryId).orElse(null)
             }
             MetricType.MYSQL.typeName -> {
-                val mysqlMetric = metricRepositories.mysqlMetricRepository.findById(lastEntryId)
-                if (mysqlMetric.isPresent) {
-                    mysqlMetric.get().asMap()
-                }
-                null
+                metricRepositories.mysqlMetricRepository.findById(lastEntryId).orElse(null)
             }
             else -> throw RuntimeException("Unknown metric type: $it.type")
-        }
+        }?.asMap()
     }
 }
