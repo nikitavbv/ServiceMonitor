@@ -38,6 +38,7 @@ import com.github.nikitavbv.servicemonitor.metric.resources.UptimeMetricReposito
 import com.github.nikitavbv.servicemonitor.user.ApplicationUserRepository
 import org.hibernate.SessionFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -140,50 +141,54 @@ class MetricController(
                 metricRepository.save(metric)
             }
 
-            when (metricType) {
-                MetricType.MEMORY.typeName -> addMemoryRecord(
-                    metric,
-                    mapper.convertValue(metricData, MemoryMetric::class.java)
-                )
-                MetricType.IO.typeName -> addIORecord(
-                    metric,
-                    mapper.convertValue(metricData, IOMetric::class.java)
-                )
-                MetricType.DISK_USAGE.typeName -> addDiskUsageRecord(
-                    metric,
-                    mapper.convertValue(metricData, DiskUsageMetric::class.java)
-                )
-                MetricType.CPU.typeName -> addCPURecord(
-                    metric,
-                    mapper.convertValue(metricData, CPUMetric::class.java)
-                )
-                MetricType.UPTIME.typeName -> addUptimeRecord(
-                    metric,
-                    mapper.convertValue(metricData, UptimeMetric::class.java)
-                )
-                MetricType.NETWORK.typeName -> addNetworkRecord(
-                    metric,
-                    mapper.convertValue(metricData, NetworkMetric::class.java)
-                )
-                MetricType.DOCKER.typeName -> addDockerRecord(
-                    metric,
-                    mapper.convertValue(metricData, DockerMetric::class.java)
-                )
-                MetricType.NGINX.typeName -> addNginxRecord(
-                    metric,
-                    mapper.convertValue(metricData, NginxMetric::class.java)
-                )
-                MetricType.MYSQL.typeName -> addMysqlRecord(
-                    metric,
-                    mapper.convertValue(metricData, MysqlMetric::class.java)
-                )
-                else -> throw InvalidParameterValueException(METRICS_BODY_KEY, "unknown metric type: $metricType")
-            }
-
+            addMetricRecord(metric, metricType, metricData, mapper)
+            
             metric.runAlertChecks(metricData, alertRepository)
         }
 
         return StatusOKResponse()
+    }
+
+    fun addMetricRecord(metric: Metric, metricType: String, metricData: MutableMap<*, *>, mapper: ObjectMapper) {
+        when (metricType) {
+            MetricType.MEMORY.typeName -> addMemoryRecord(
+                metric,
+                mapper.convertValue(metricData, MemoryMetric::class.java)
+            )
+            MetricType.IO.typeName -> addIORecord(
+                metric,
+                mapper.convertValue(metricData, IOMetric::class.java)
+            )
+            MetricType.DISK_USAGE.typeName -> addDiskUsageRecord(
+                metric,
+                mapper.convertValue(metricData, DiskUsageMetric::class.java)
+            )
+            MetricType.CPU.typeName -> addCPURecord(
+                metric,
+                mapper.convertValue(metricData, CPUMetric::class.java)
+            )
+            MetricType.UPTIME.typeName -> addUptimeRecord(
+                metric,
+                mapper.convertValue(metricData, UptimeMetric::class.java)
+            )
+            MetricType.NETWORK.typeName -> addNetworkRecord(
+                metric,
+                mapper.convertValue(metricData, NetworkMetric::class.java)
+            )
+            MetricType.DOCKER.typeName -> addDockerRecord(
+                metric,
+                mapper.convertValue(metricData, DockerMetric::class.java)
+            )
+            MetricType.NGINX.typeName -> addNginxRecord(
+                metric,
+                mapper.convertValue(metricData, NginxMetric::class.java)
+            )
+            MetricType.MYSQL.typeName -> addMysqlRecord(
+                metric,
+                mapper.convertValue(metricData, MysqlMetric::class.java)
+            )
+            else -> throw InvalidParameterValueException(METRICS_BODY_KEY, "unknown metric type: $metricType")
+        }
     }
 
     fun addMemoryRecord(metricBase: Metric, metric: MemoryMetric) {
