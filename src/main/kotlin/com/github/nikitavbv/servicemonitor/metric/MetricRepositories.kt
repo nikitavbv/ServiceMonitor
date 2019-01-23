@@ -25,9 +25,9 @@ data class MetricRepositories(
     val dockerMetricRepository: DockerMetricRepository,
     val nginxMetricRepository: NginxMetricRepository,
     val mysqlMetricRepository: MysqlMetricRepository,
-    val cpuUsageRepository: CPUUsageRepository?,
-    val filesystemUsageRepository: FilesystemUsageRepository?,
-    val dockerContainerDataRepository: DockerContainerDataRepository?,
-    val deviceIORepository: DeviceIORepository?,
-    val networkDeviceDataRepository: NetworkDeviceDataRepository?
+    val cpuUsageRepository: CPUUsageRepository? = null,
+    val filesystemUsageRepository: FilesystemUsageRepository? = null,
+    val dockerContainerDataRepository: DockerContainerDataRepository? = null,
+    val deviceIORepository: DeviceIORepository? = null,
+    val networkDeviceDataRepository: NetworkDeviceDataRepository? = null
 )
