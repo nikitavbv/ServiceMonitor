@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.github.nikitavbv.servicemonitor.agent.Agent
 import com.github.nikitavbv.servicemonitor.alert.Alert
 import com.github.nikitavbv.servicemonitor.alert.AlertRepository
+import java.lang.AssertionError
 import javax.persistence.CascadeType
 import javax.persistence.Entity
 import javax.persistence.FetchType
@@ -35,5 +36,9 @@ data class Metric(
 
     fun runAlertChecks(metricData: MutableMap<*, *>, alertRepository: AlertRepository) {
         alerts.forEach { it.runCheck(metricData, alertRepository) }
+    }
+
+    fun getAgentStrictly(): Agent {
+        return this.agent ?: throw AssertionError("Metric agent is not set")
     }
 }

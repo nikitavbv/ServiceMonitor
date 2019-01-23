@@ -101,7 +101,7 @@ class AgentController(
 
     @PutMapping
     fun updateAgent(@RequestBody updates: Map<String, Any>): StatusOKResponse {
-        val agentAPIKey = (updates["token"] ?: throw MissingParameterException("token")).toString()
+        val agentAPIKey = getRequiredBodyParameter(updates, "token").toString()
         val agent = agentRepository.findByApiKey(agentAPIKey) ?: throw AgentNotFoundException()
         updates.keys.forEach {
             when (it) {
@@ -130,7 +130,7 @@ class AgentController(
     ): StatusOKResponse {
         val user = getApplicationUserByHttpRequest(req)
         val agent = agentRepository.findById(agentID).orElseThrow { AgentNotFoundException() }
-        val project = agent.project ?: throw AssertionError("No project set for agent")
+        val project = agent.getProjectStrict()
         if (!project.users.contains(user)) throw AccessDeniedException()
         updates.keys.forEach {
             when (it) {
@@ -174,5 +174,9 @@ class AgentController(
 
     fun getApplicationUserByHttpRequest(req: HttpServletRequest): ApplicationUser {
         return applicationUserRepository.findByUsername(req.remoteUser ?: throw AuthRequiredException())
+    }
+
+    fun getRequiredBodyParameter(body: Map<String, Any>, parameterName: String): Any? {
+        return body[parameterName] ?: throw MissingParameterException(parameterName)
     }
 }

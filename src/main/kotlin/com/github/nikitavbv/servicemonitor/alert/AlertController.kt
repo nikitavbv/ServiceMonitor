@@ -75,7 +75,7 @@ class AlertController(
     fun deleteAlert(req: HttpServletRequest, @PathVariable alertID: Long): StatusOKResponse {
         val user = getApplicationUserByHttpRequest(req)
         val alert = alertRepository.findById(alertID).orElseThrow { AlertNotFoundException() }
-        val agent = alert.metric.agent ?: throw AssertionError("Metric has no agent set")
+        val agent = alert.metric.getAgentStrictly()
         val project = agent.project ?: throw AssertionError("Agent has no project set")
         if (!project.users.contains(user)) throw AccessDeniedException()
 

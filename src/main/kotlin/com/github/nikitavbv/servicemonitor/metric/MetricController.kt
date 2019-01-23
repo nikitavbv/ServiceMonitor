@@ -88,7 +88,7 @@ class MetricController(
     ): Map<String, Any?> {
         val user = getApplicationUserByHttpRequest(req)
         val metric = metricRepository.findById(metricID).orElseThrow { MetricNotFoundException() }
-        val agent = metric.agent ?: throw AssertionError("No agent set for metric")
+        val agent = metric.getAgentStrictly()
         val project = agent.project ?: throw AssertionError("No project set for agent")
         if (!project.users.contains(user)) throw AccessDeniedException()
         val sessionFactory = entityManagerFactory.unwrap(SessionFactory::class.java)

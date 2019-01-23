@@ -150,4 +150,8 @@ data class Agent(
         }
         this.tags = tags.joinToString(",")
     }
+
+    fun getProjectStrict(): Project {
+        return this.project ?: throw AssertionError("Project is not set for agent")
+    }
 }

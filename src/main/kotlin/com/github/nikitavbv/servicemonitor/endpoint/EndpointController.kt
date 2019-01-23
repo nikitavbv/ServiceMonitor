@@ -14,7 +14,7 @@ class EndpointController(
     var agentRepository: AgentRepository
 ) {
 
-    @Scheduled(fixedRate = 1000 * 60)
+    @Scheduled(fixedRate = MINUTE)
     fun checkEndpoints() {
         agentRepository.findAll()
             .filter {
@@ -41,22 +41,24 @@ class EndpointController(
                     val response = httpClient?.execute(httpGet)
                     totalTime = System.currentTimeMillis() - startedAt
                     if (response?.statusLine?.statusCode != HttpStatus.OK.value()) {
-                        it.properties["totalErrors"] = ((it.properties["totalErrors"])!!.toLong() + 1).toString()
+                        it.properties["totalErrors"] = (
+                            (it.properties["totalErrors"])!!.toLong() + ERRORS_INC
+                        ).toString()
                     }
                     response?.close()
                 } catch (e: HttpException) {
                     totalTime = System.currentTimeMillis() - startedAt
-                    it.properties["totalErrors"] = ((it.properties["totalErrors"])!!.toLong() + 1).toString()
+                    it.properties["totalErrors"] = ((it.properties["totalErrors"])!!.toLong() + ERRORS_INC).toString()
                 }
                 it.properties["totalTime"] = ((it.properties["totalTime"])!!.toLong() + totalTime).toString()
-                it.properties["totalRequests"] = ((it.properties["totalRequests"])!!.toLong() + 1).toString()
+                it.properties["totalRequests"] = ((it.properties["totalRequests"])!!.toLong() + REQUEST_INC).toString()
                 httpClient?.close()
 
                 agentRepository.save(it)
             }
     }
 
-    @Scheduled(fixedRate = 1000 * 60 * 60 * 24)
+    @Scheduled(fixedRate = DAY)
     fun resetEndpointStats() {
         agentRepository.findAll()
             .filter { it.type == "endpoint" }
@@ -66,5 +68,12 @@ class EndpointController(
                 it.properties["totalErrors"] = "0"
                 agentRepository.save(it)
             }
+    }
+
+    companion object {
+        const val ERRORS_INC = 1
+        const val REQUEST_INC = 1
+        const val MINUTE = 1000 * 60L
+        const val DAY = MINUTE * 60 * 24
     }
 }
