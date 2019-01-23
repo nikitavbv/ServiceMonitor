@@ -167,19 +167,20 @@ class AgentController(
             if (it != "token") {
                 when (it) {
                     "name" -> agent.name = updates[it].toString()
-                    "properties" -> {
-                        val properties = updates["properties"] as Map<*, *>
-                        properties.keys.forEach { propertyName ->
-                            val propertyValue = properties[propertyName].toString()
-                            agent.properties[propertyName.toString()] = propertyValue
-                        }
-                    }
+                    "properties" -> updateAgentProperties(agent, updates["properties"] as Map<*, *>)
                     else -> throw UnknownParameterException(it)
                 }
             }
         }
         agentRepository.save(agent)
         return StatusOKResponse()
+    }
+
+    private fun updateAgentProperties(agent: Agent, properties: Map<*, *>) {
+        properties.keys.forEach { propertyName ->
+            val propertyValue = properties[propertyName].toString()
+            agent.properties[propertyName.toString()] = propertyValue
+        }
     }
 
     @PutMapping("/{agentID}")
