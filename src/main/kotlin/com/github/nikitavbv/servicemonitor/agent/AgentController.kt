@@ -164,12 +164,11 @@ class AgentController(
         val agentAPIKey = (updates["token"] ?: throw MissingParameterException("token")).toString()
         val agent = agentRepository.findByApiKey(agentAPIKey) ?: throw AgentNotFoundException()
         updates.keys.forEach {
-            if (it != "token") {
-                when (it) {
-                    "name" -> agent.name = updates[it].toString()
-                    "properties" -> updateAgentProperties(agent, updates["properties"] as Map<*, *>)
-                    else -> throw UnknownParameterException(it)
-                }
+            when (it) {
+                "name" -> agent.name = updates[it].toString()
+                "properties" -> updateAgentProperties(agent, updates["properties"] as Map<*, *>)
+                "token" -> {}
+                else -> throw UnknownParameterException(it)
             }
         }
         agentRepository.save(agent)
