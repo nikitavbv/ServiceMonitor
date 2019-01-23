@@ -61,15 +61,10 @@ data class Alert(
         if (triggerDate != null) {
             val timeDifference = Date().time - triggerDate.time
             if (timeDifference > ALERT_MIN_TIME_DIFFERENCE) {
-                try {
-                    runAction(action)
-                    actionExecuted = true
-                    triggered = state
-                    alertRepository.save(this)
-                } catch (e: Exception) {
-                    println("Running action failed with exception")
-                    return
-                }
+                runAction(action)
+                actionExecuted = true
+                triggered = state
+                alertRepository.save(this)
             } else {
                 return
             }
