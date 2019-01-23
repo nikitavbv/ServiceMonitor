@@ -175,8 +175,4 @@ class AgentController(
     fun getApplicationUserByHttpRequest(req: HttpServletRequest): ApplicationUser {
         return applicationUserRepository.findByUsername(req.remoteUser ?: throw AuthRequiredException())
     }
-
-    fun getRequiredBodyParameter(body: Map<String, Any>, parameterName: String): Any? {
-        return body[parameterName] ?: throw MissingParameterException(parameterName)
-    }
 }
