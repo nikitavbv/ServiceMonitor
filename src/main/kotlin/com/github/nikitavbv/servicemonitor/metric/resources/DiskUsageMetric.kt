@@ -2,6 +2,7 @@ package com.github.nikitavbv.servicemonitor.metric.resources
 
 import com.github.nikitavbv.servicemonitor.metric.AbstractMetric
 import com.github.nikitavbv.servicemonitor.metric.Metric
+import com.github.nikitavbv.servicemonitor.metric.MetricRepositories
 import com.github.nikitavbv.servicemonitor.metric.MetricType
 import java.util.Date
 import javax.persistence.Entity
@@ -24,6 +25,13 @@ data class DiskUsageMetric(
     @OneToMany(targetEntity = FilesystemUsage::class, mappedBy = "metric", fetch = FetchType.EAGER)
     val filesystems: List<FilesystemUsage>
 ) : AbstractMetric() {
+
+    override fun saveToRepository(metricBase: Metric, metricRepositories: MetricRepositories): Long? {
+        this.metricBase = metricBase
+        metricRepositories.diskUsageMetricRepository.save(this)
+        filesystems.forEach { it.metric = this; metricRepositories.filesystemUsageRepository?.save(it) }
+        return id
+    }
 
     override fun asMap(): Map<String, Any?> {
         return mapOf(

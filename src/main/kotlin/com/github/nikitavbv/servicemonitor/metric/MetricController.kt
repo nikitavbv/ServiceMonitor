@@ -156,64 +156,35 @@ class MetricController(
     }
 
     fun addMetricRecord(metricBase: Metric, metricType: String, metricData: MutableMap<*, *>, mapper: ObjectMapper) {
-        metricBase.lastEntryID = saveMetric(metricBase, metricType, metricData, mapper)
-        metricRepository.save(metricBase)
-    }
-
-    fun saveMetric(metricBase: Metric, metricType: String, metricData: MutableMap<*, *>, mapper: ObjectMapper): Long? {
-        return when (metricType) {
-            MetricType.MEMORY.typeName -> saveMemoryMetric(
-                mapper.convertValue(metricData, MemoryMetric::class.java),
-                metricBase,
-                memoryMetricRepository
-            )
-            MetricType.IO.typeName -> saveIOMetric(
-                mapper.convertValue(metricData, IOMetric::class.java),
-                metricBase,
-                ioMetricRepository,
-                deviceIORepository
-            )
-            MetricType.DISK_USAGE.typeName -> saveDiskUsageMetric(
-                mapper.convertValue(metricData, DiskUsageMetric::class.java),
-                metricBase,
-                diskUsageMetricRepository,
-                filesystemUsageRepository
-            )
-            MetricType.CPU.typeName -> saveCPUMetric(
-                mapper.convertValue(metricData, CPUMetric::class.java),
-                metricBase,
-                cpuMetricRepository,
-                cpuUsageRepository
-            )
-            MetricType.UPTIME.typeName -> saveUptimeMetric(
-                mapper.convertValue(metricData, UptimeMetric::class.java),
-                metricBase,
-                uptimeMetricRepository
-            )
-            MetricType.NETWORK.typeName -> saveNetworkMetric(
-                mapper.convertValue(metricData, NetworkMetric::class.java),
-                metricBase,
-                networkMetricRepository,
-                networkDeviceDataRepository
-            )
-            MetricType.DOCKER.typeName -> saveDockerMetric(
-                mapper.convertValue(metricData, DockerMetric::class.java),
-                metricBase,
-                dockerMetricRepository,
-                dockerContainerDataRepository
-            )
-            MetricType.NGINX.typeName -> saveNGINXMetric(
-                mapper.convertValue(metricData, NginxMetric::class.java),
-                metricBase,
-                nginxMetricRepository
-            )
-            MetricType.MYSQL.typeName -> saveMySQLMetric(
-                mapper.convertValue(metricData, MysqlMetric::class.java),
-                metricBase,
-                mysqlMetricRepository
-            )
+        val metric = when (metricType) {
+            MetricType.MEMORY.typeName -> mapper.convertValue(metricData, MemoryMetric::class.java)
+            MetricType.IO.typeName -> mapper.convertValue(metricData, IOMetric::class.java)
+            MetricType.DISK_USAGE.typeName -> mapper.convertValue(metricData, DiskUsageMetric::class.java)
+            MetricType.CPU.typeName -> mapper.convertValue(metricData, CPUMetric::class.java)
+            MetricType.UPTIME.typeName -> mapper.convertValue(metricData, UptimeMetric::class.java)
+            MetricType.NETWORK.typeName -> mapper.convertValue(metricData, NetworkMetric::class.java)
+            MetricType.DOCKER.typeName -> mapper.convertValue(metricData, DockerMetric::class.java)
+            MetricType.NGINX.typeName -> mapper.convertValue(metricData, NginxMetric::class.java)
+            MetricType.MYSQL.typeName -> mapper.convertValue(metricData, MysqlMetric::class.java)
             else -> throw InvalidParameterValueException(METRICS_BODY_KEY, "unknown metric type: $metricType")
         }
+        metricBase.lastEntryID = metric.saveToRepository(metricBase, MetricRepositories(
+            memoryMetricRepository,
+            ioMetricRepository,
+            diskUsageMetricRepository,
+            cpuMetricRepository,
+            uptimeMetricRepository,
+            networkMetricRepository,
+            dockerMetricRepository,
+            nginxMetricRepository,
+            mysqlMetricRepository,
+            cpuUsageRepository,
+            filesystemUsageRepository,
+            dockerContainerDataRepository,
+            deviceIORepository,
+            networkDeviceDataRepository
+        ))
+        metricRepository.save(metricBase)
     }
 
     fun getRequestAPIToken(body: Map<String, Any>): String {
