@@ -1,6 +1,7 @@
 package com.github.nikitavbv.servicemonitor.api
 
 import com.github.nikitavbv.servicemonitor.INIT_API
+import com.github.nikitavbv.servicemonitor.metric.MetricRepositories
 import com.github.nikitavbv.servicemonitor.metric.resources.CPUMetricRepository
 import com.github.nikitavbv.servicemonitor.metric.resources.DiskUsageMetricRepository
 import com.github.nikitavbv.servicemonitor.metric.resources.DockerMetricRepository
@@ -45,15 +46,17 @@ class InitAPIController(
                     project.agents.forEach { agent ->
                         agents.add(
                             agent.toMap(
-                                memoryMetricRepository,
-                                ioMetricRepository,
-                                diskUsageMetricRepository,
-                                cpuMetricRepository,
-                                uptimeMetricRepository,
-                                networkMetricRepository,
-                                dockerMetricRepository,
-                                nginxMetricRepository,
-                                mysqlMetricRepository
+                                MetricRepositories(
+                                    memoryMetricRepository,
+                                    ioMetricRepository,
+                                    diskUsageMetricRepository,
+                                    cpuMetricRepository,
+                                    uptimeMetricRepository,
+                                    networkMetricRepository,
+                                    dockerMetricRepository,
+                                    nginxMetricRepository,
+                                    mysqlMetricRepository
+                                 )
                             )
                         )
                     }
