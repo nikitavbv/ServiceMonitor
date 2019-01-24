@@ -49,6 +49,7 @@ import java.util.Date
 import java.util.stream.Collectors
 import javax.persistence.EntityManagerFactory
 import javax.servlet.http.HttpServletRequest
+import kotlin.reflect.KClass
 
 @RestController
 @RequestMapping(METRIC_API)
@@ -177,7 +178,11 @@ class MetricController(
     }
 
     fun mapMetric(metricType: String, metricData: MutableMap<*, *>, mapper: ObjectMapper): AbstractMetric {
-        return mapper.convertValue(metricData, when (metricType) {
+        return mapper.convertValue(metricData, getClassByMetricType(metricType)) as AbstractMetric
+    }
+
+    fun getClassByMetricType(metricType: String): Class<*> {
+        return when (metricType) {
             MetricType.MEMORY.typeName -> MemoryMetric::class.java
             MetricType.IO.typeName -> IOMetric::class.java
             MetricType.DISK_USAGE.typeName -> DiskUsageMetric::class.java
@@ -188,7 +193,7 @@ class MetricController(
             MetricType.NGINX.typeName -> NginxMetric::class.java
             MetricType.MYSQL.typeName -> MysqlMetric::class.java
             else -> throw InvalidParameterValueException(METRICS_BODY_KEY, "unknown metric type: $metricType")
-        })
+        }
     }
 
     fun findAgentByAPIToken(apiToken: String): Agent {
