@@ -99,20 +99,32 @@ data class Agent(
     }
 
     private fun getMetric(it: Metric, metricRepositories: MetricRepositories, lastEntryId: Long): AbstractMetric? {
-        return when (it.type) {
-            MetricType.MEMORY.typeName -> getMemoryMetric(metricRepositories.memoryMetricRepository, lastEntryId)
-            MetricType.IO.typeName -> getIOMetric(metricRepositories.ioMetricRepository, lastEntryId)
-            MetricType.DISK_USAGE.typeName -> getDiskUsageMetric(
+        return when (getMetricTypeByTypeName(it.type)) {
+            MetricType.MEMORY -> getMemoryMetric(metricRepositories.memoryMetricRepository, lastEntryId)
+            MetricType.IO -> getIOMetric(metricRepositories.ioMetricRepository, lastEntryId)
+            MetricType.DISK_USAGE -> getDiskUsageMetric(
                 metricRepositories.diskUsageMetricRepository,
                 lastEntryId
             )
-            MetricType.CPU.typeName -> getCPUMetric(metricRepositories.cpuMetricRepository, lastEntryId)
-            MetricType.UPTIME.typeName -> getUptimeMetric(metricRepositories.uptimeMetricRepository, lastEntryId)
-            MetricType.NETWORK.typeName -> getNetworkMetric(metricRepositories.networkMetricRepository, lastEntryId)
-            MetricType.DOCKER.typeName -> getDockerMetric(metricRepositories.dockerMetricRepository, lastEntryId)
-            MetricType.NGINX.typeName -> getNginxMetric(metricRepositories.nginxMetricRepository, lastEntryId)
-            MetricType.MYSQL.typeName -> getMysqlMetric(metricRepositories.mysqlMetricRepository, lastEntryId)
-            else -> throw AssertionError("Unknown metric type: $it.type")
+            MetricType.CPU -> getCPUMetric(metricRepositories.cpuMetricRepository, lastEntryId)
+            MetricType.UPTIME -> getUptimeMetric(metricRepositories.uptimeMetricRepository, lastEntryId)
+            MetricType.NETWORK -> getNetworkMetric(metricRepositories.networkMetricRepository, lastEntryId)
+            MetricType.DOCKER -> getDockerMetric(metricRepositories.dockerMetricRepository, lastEntryId)
+            MetricType.NGINX -> getNginxMetric(metricRepositories.nginxMetricRepository, lastEntryId)
+            MetricType.MYSQL -> getMysqlMetric(metricRepositories.mysqlMetricRepository, lastEntryId)
+        }
+    }
+
+    private fun getMetricTypeByTypeName(metricType: String?): MetricType {
+        return when(metricType) {
+            MetricType.MEMORY.typeName -> MetricType.MEMORY
+            MetricType.CPU.typeName -> MetricType.CPU
+            MetricType.UPTIME.typeName -> MetricType.UPTIME
+            MetricType.NETWORK.typeName -> MetricType.NETWORK
+            MetricType.DOCKER.typeName -> MetricType.DOCKER
+            MetricType.NGINX.typeName -> MetricType.NGINX
+            MetricType.MYSQL.typeName -> MetricType.MYSQL
+            else -> throw AssertionError("Unknown metric type: $metricType")
         }
     }
 
