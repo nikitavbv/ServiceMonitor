@@ -131,7 +131,7 @@ class AgentController(
     ): StatusOKResponse {
         val user = getApplicationUserByHttpRequest(req)
         val agent = agentRepository.findById(agentID).orElseThrow { AgentNotFoundException() }
-        val project = agent.getProjectStrict()
+        val project = agent.strictProject()
         if (!project.users.contains(user)) throw AccessDeniedException()
         updates.keys.forEach {
             when (it) {

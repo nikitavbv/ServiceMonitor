@@ -1,0 +1,9 @@
+spring.jpa.hibernate.ddl-auto=update
+spring.datasource.url=jdbc:mysql://localhost:3306/servicemonitor
+spring.datasource.username=devuser
+spring.datasource.password=devpassword
+
+server.contextPath=/api/*
+
+app.general.url=http://localhost:8080
+app.security.secret=ZgVwlRAju/KsjcYLDxYbuH3d/eTq6HmEcC6pbEiY0CkiuWfwIzi5XmE7WY5M8Pis9W98PPHd4KHg6LWPNHXq6A==

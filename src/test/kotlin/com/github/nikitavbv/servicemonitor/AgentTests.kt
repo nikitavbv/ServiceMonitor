@@ -64,8 +64,8 @@ class AgentTests {
         mockMvc.perform(post(AGENT_API)
             .contentType(MediaType.APPLICATION_JSON)
             .content(printer.writeValueAsBytes(mapOf(
-                "projectKey" to project.apiKey,
-                "description" to "Ubuntu 18.04.1 LTS"
+                "token" to project.apiKey,
+                "name" to "Ubuntu 18.04.1 LTS"
             ))))
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.id", anything()))
