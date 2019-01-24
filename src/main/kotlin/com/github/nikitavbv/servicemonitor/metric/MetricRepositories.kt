@@ -47,12 +47,11 @@ class MetricRepositories(
     }
 
     private fun getAppMetricRepositoryByMetricType(metricType: MetricType): JpaRepository<*, Long>? {
-        return when(metricType) {
+        return when (metricType) {
             MetricType.DOCKER -> dockerMetricRepository
             MetricType.NGINX -> nginxMetricRepository
             MetricType.MYSQL -> mysqlMetricRepository
             else -> null
         }
     }
-
 }
