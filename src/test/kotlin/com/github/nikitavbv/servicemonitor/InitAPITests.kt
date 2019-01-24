@@ -61,7 +61,7 @@ class InitAPITests {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser("admin")
     fun `init call with admin user and auth`() {
         val user = ApplicationUser(
             username = "admin",
