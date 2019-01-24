@@ -1,14 +1,25 @@
 package com.github.nikitavbv.servicemonitor.metric
 
-enum class MetricType(val typeName: String) {
+import com.github.nikitavbv.servicemonitor.metric.resources.CPUMetric
+import com.github.nikitavbv.servicemonitor.metric.resources.DiskUsageMetric
+import com.github.nikitavbv.servicemonitor.metric.resources.DockerMetric
+import com.github.nikitavbv.servicemonitor.metric.resources.IOMetric
+import com.github.nikitavbv.servicemonitor.metric.resources.MemoryMetric
+import com.github.nikitavbv.servicemonitor.metric.resources.MysqlMetric
+import com.github.nikitavbv.servicemonitor.metric.resources.NetworkMetric
+import com.github.nikitavbv.servicemonitor.metric.resources.NginxMetric
+import com.github.nikitavbv.servicemonitor.metric.resources.UptimeMetric
+import kotlin.reflect.KClass
 
-    MEMORY("memory"),
-    IO("io"),
-    DISK_USAGE("diskUsage"),
-    CPU("cpu"),
-    UPTIME("uptime"),
-    NETWORK("network"),
-    DOCKER("docker"),
-    NGINX("nginx"),
-    MYSQL("mysql")
+enum class MetricType(val typeName: String, val kclass: KClass<*>) {
+
+    MEMORY("memory", MemoryMetric::class),
+    IO("io", IOMetric::class),
+    DISK_USAGE("diskUsage", DiskUsageMetric::class),
+    CPU("cpu", CPUMetric::class),
+    UPTIME("uptime", UptimeMetric::class),
+    NETWORK("network", NetworkMetric::class),
+    DOCKER("docker", DockerMetric::class),
+    NGINX("nginx", NginxMetric::class),
+    MYSQL("mysql", MysqlMetric::class)
 }

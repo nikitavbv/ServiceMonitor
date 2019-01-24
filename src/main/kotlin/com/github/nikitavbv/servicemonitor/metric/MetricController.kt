@@ -177,21 +177,7 @@ class MetricController(
     }
 
     fun mapMetric(metricType: String, metricData: MutableMap<*, *>, mapper: ObjectMapper): AbstractMetric {
-        return mapper.convertValue(metricData, getClassByMetricType(metricType).java) as AbstractMetric
-    }
-
-    fun getClassByMetricType(metricType: String): KClass<*> {
-        return when (MetricType.valueOf(metricType)) {
-            MetricType.MEMORY -> MemoryMetric::class
-            MetricType.IO -> IOMetric::class
-            MetricType.DISK_USAGE -> DiskUsageMetric::class
-            MetricType.CPU -> CPUMetric::class
-            MetricType.UPTIME -> UptimeMetric::class
-            MetricType.NETWORK -> NetworkMetric::class
-            MetricType.DOCKER -> DockerMetric::class
-            MetricType.NGINX -> NginxMetric::class
-            MetricType.MYSQL -> MysqlMetric::class
-        }
+        return mapper.convertValue(metricData, MetricType.valueOf(metricType).kclass.java) as AbstractMetric
     }
 
     fun findAgentByAPIToken(apiToken: String): Agent {
