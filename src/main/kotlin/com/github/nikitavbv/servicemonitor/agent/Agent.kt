@@ -95,11 +95,15 @@ data class Agent(
         metricRepositories: MetricRepositories,
         lastEntryId: Long
     ): Map<String, Any?>? {
-        return getMetric(it, metricRepositories, lastEntryId)?.asMap()
+        return getMetric(getMetricTypeByTypeName(it.type), metricRepositories, lastEntryId)?.asMap()
     }
 
-    private fun getMetric(it: Metric, metricRepositories: MetricRepositories, lastEntryId: Long): AbstractMetric? {
-        return when (getMetricTypeByTypeName(it.type)) {
+    private fun getMetric(
+        metricType: MetricType,
+        metricRepositories: MetricRepositories,
+        lastEntryId: Long
+    ): AbstractMetric? {
+        return when (metricType) {
             MetricType.MEMORY -> getMemoryMetric(metricRepositories.memoryMetricRepository, lastEntryId)
             MetricType.IO -> getIOMetric(metricRepositories.ioMetricRepository, lastEntryId)
             MetricType.DISK_USAGE -> getDiskUsageMetric(
@@ -116,7 +120,7 @@ data class Agent(
     }
 
     private fun getMetricTypeByTypeName(metricType: String?): MetricType {
-        return when(metricType) {
+        return when (metricType) {
             MetricType.MEMORY.typeName -> MetricType.MEMORY
             MetricType.CPU.typeName -> MetricType.CPU
             MetricType.UPTIME.typeName -> MetricType.UPTIME

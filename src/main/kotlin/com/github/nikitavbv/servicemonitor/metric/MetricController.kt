@@ -10,7 +10,6 @@ import com.github.nikitavbv.servicemonitor.api.StatusOKResponse
 import com.github.nikitavbv.servicemonitor.exceptions.AccessDeniedException
 import com.github.nikitavbv.servicemonitor.exceptions.AuthRequiredException
 import com.github.nikitavbv.servicemonitor.exceptions.InvalidParameterValueException
-import com.github.nikitavbv.servicemonitor.exceptions.MissingParameterException
 import com.github.nikitavbv.servicemonitor.getRequestAPIToken
 import com.github.nikitavbv.servicemonitor.metric.resources.CPUMetric
 import com.github.nikitavbv.servicemonitor.metric.resources.CPUMetricRepository
@@ -178,40 +177,26 @@ class MetricController(
     }
 
     fun mapMetric(metricType: String, metricData: MutableMap<*, *>, mapper: ObjectMapper): AbstractMetric {
-        return mapper.convertValue(metricData, getClassByMetricType(metricType)) as AbstractMetric
+        return mapper.convertValue(metricData, getClassByMetricType(metricType).java) as AbstractMetric
     }
 
-    fun getClassByMetricType(metricType: String): Class<*> {
+    fun getClassByMetricType(metricType: String): KClass<*> {
         return when (metricType) {
-            MetricType.MEMORY.typeName -> MemoryMetric::class.java
-            MetricType.IO.typeName -> IOMetric::class.java
-            MetricType.DISK_USAGE.typeName -> DiskUsageMetric::class.java
-            MetricType.CPU.typeName -> CPUMetric::class.java
-            MetricType.UPTIME.typeName -> UptimeMetric::class.java
-            MetricType.NETWORK.typeName -> NetworkMetric::class.java
-            MetricType.DOCKER.typeName -> DockerMetric::class.java
-            MetricType.NGINX.typeName -> NginxMetric::class.java
-            MetricType.MYSQL.typeName -> MysqlMetric::class.java
+            MetricType.MEMORY.typeName -> MemoryMetric::class
+            MetricType.IO.typeName -> IOMetric::class
+            MetricType.DISK_USAGE.typeName -> DiskUsageMetric::class
+            MetricType.CPU.typeName -> CPUMetric::class
+            MetricType.UPTIME.typeName -> UptimeMetric::class
+            MetricType.NETWORK.typeName -> NetworkMetric::class
+            MetricType.DOCKER.typeName -> DockerMetric::class
+            MetricType.NGINX.typeName -> NginxMetric::class
+            MetricType.MYSQL.typeName -> MysqlMetric::class
             else -> throw InvalidParameterValueException(METRICS_BODY_KEY, "unknown metric type: $metricType")
         }
     }
 
     fun findAgentByAPIToken(apiToken: String): Agent {
         return agentRepository.findByApiKey(apiToken) ?: throw AgentNotFoundException()
-    }
-
-    fun getMapList(m: Map<String, Any>, parameter: String): List<*> {
-        return (m[parameter] ?: throw MissingParameterException(parameter)) as? List<*>
-            ?: throw InvalidParameterValueException(parameter)
-    }
-
-    fun anyToMutableMap(a: Any?, parameterName: String): MutableMap<*, *> {
-        return a as? MutableMap<*, *> ?: throw InvalidParameterValueException(parameterName)
-    }
-
-    fun getMetricStringField(metricData: MutableMap<*, *>, metricsParameterName: String, fieldName: String): String {
-        return metricData[fieldName] as? String
-            ?: throw InvalidParameterValueException(metricsParameterName, "non-string metric $fieldName")
     }
 
     fun getApplicationUserByHttpRequest(req: HttpServletRequest): ApplicationUser {
