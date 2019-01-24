@@ -93,7 +93,7 @@ class AgentTests {
             ))))
             .andExpect(status().isBadRequest)
             .andExpect(jsonPath("$.error", equalTo("missing_parameter")))
-            .andExpect(jsonPath("$.missing_parameter", equalTo("projectKey")))
+            .andExpect(jsonPath("$.missing_parameter", equalTo("token")))
     }
 
     @Test
