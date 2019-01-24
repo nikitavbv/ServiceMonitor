@@ -181,17 +181,16 @@ class MetricController(
     }
 
     fun getClassByMetricType(metricType: String): KClass<*> {
-        return when (metricType) {
-            MetricType.MEMORY.typeName -> MemoryMetric::class
-            MetricType.IO.typeName -> IOMetric::class
-            MetricType.DISK_USAGE.typeName -> DiskUsageMetric::class
-            MetricType.CPU.typeName -> CPUMetric::class
-            MetricType.UPTIME.typeName -> UptimeMetric::class
-            MetricType.NETWORK.typeName -> NetworkMetric::class
-            MetricType.DOCKER.typeName -> DockerMetric::class
-            MetricType.NGINX.typeName -> NginxMetric::class
-            MetricType.MYSQL.typeName -> MysqlMetric::class
-            else -> throw InvalidParameterValueException(METRICS_BODY_KEY, "unknown metric type: $metricType")
+        return when (MetricType.valueOf(metricType)) {
+            MetricType.MEMORY -> MemoryMetric::class
+            MetricType.IO -> IOMetric::class
+            MetricType.DISK_USAGE -> DiskUsageMetric::class
+            MetricType.CPU -> CPUMetric::class
+            MetricType.UPTIME -> UptimeMetric::class
+            MetricType.NETWORK -> NetworkMetric::class
+            MetricType.DOCKER -> DockerMetric::class
+            MetricType.NGINX -> NginxMetric::class
+            MetricType.MYSQL -> MysqlMetric::class
         }
     }
 
