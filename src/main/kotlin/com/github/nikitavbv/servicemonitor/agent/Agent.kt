@@ -102,21 +102,18 @@ data class Agent(
         metricType: MetricType,
         metricRepositories: MetricRepositories,
         lastEntryId: Long
-    ): AbstractMetric? {
+    ): AbstractMetric {
         return when (metricType) {
-            MetricType.MEMORY -> getMemoryMetric(metricRepositories.memoryMetricRepository, lastEntryId)
-            MetricType.IO -> getIOMetric(metricRepositories.ioMetricRepository, lastEntryId)
-            MetricType.DISK_USAGE -> getDiskUsageMetric(
-                metricRepositories.diskUsageMetricRepository,
-                lastEntryId
-            )
-            MetricType.CPU -> getCPUMetric(metricRepositories.cpuMetricRepository, lastEntryId)
-            MetricType.UPTIME -> getUptimeMetric(metricRepositories.uptimeMetricRepository, lastEntryId)
-            MetricType.NETWORK -> getNetworkMetric(metricRepositories.networkMetricRepository, lastEntryId)
-            MetricType.DOCKER -> getDockerMetric(metricRepositories.dockerMetricRepository, lastEntryId)
-            MetricType.NGINX -> getNginxMetric(metricRepositories.nginxMetricRepository, lastEntryId)
-            MetricType.MYSQL -> getMysqlMetric(metricRepositories.mysqlMetricRepository, lastEntryId)
-        }
+            MetricType.MEMORY -> metricRepositories.memoryMetricRepository
+            MetricType.IO -> metricRepositories.ioMetricRepository
+            MetricType.DISK_USAGE -> metricRepositories.diskUsageMetricRepository
+            MetricType.CPU -> metricRepositories.cpuMetricRepository
+            MetricType.UPTIME -> metricRepositories.uptimeMetricRepository
+            MetricType.NETWORK -> metricRepositories.networkMetricRepository
+            MetricType.DOCKER -> metricRepositories.dockerMetricRepository
+            MetricType.NGINX -> metricRepositories.nginxMetricRepository
+            MetricType.MYSQL -> metricRepositories.mysqlMetricRepository
+        }.getOne(lastEntryId)
     }
 
     private fun getMetricTypeByTypeName(metricType: String?): MetricType {
