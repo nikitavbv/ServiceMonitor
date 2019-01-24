@@ -6,6 +6,7 @@ import com.github.nikitavbv.servicemonitor.exceptions.InvalidParameterValueExcep
 import com.github.nikitavbv.servicemonitor.exceptions.MissingAPIKeyException
 import com.github.nikitavbv.servicemonitor.exceptions.MissingParameterException
 import com.github.nikitavbv.servicemonitor.exceptions.UnknownParameterException
+import com.github.nikitavbv.servicemonitor.security.PermissionDeniedException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.HttpMessageNotReadableException
@@ -22,6 +23,16 @@ class CustomControllerAdvice {
     ): ResponseEntity<Map<String, Any>> {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(mapOf(
             "error" to "auth_required"
+        ))
+    }
+
+    @ExceptionHandler(PermissionDeniedException::class)
+    fun handlePermissionDeniedException(
+        exception: PermissionDeniedException
+    ): ResponseEntity<Map<String, Any>> {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(mapOf(
+            "error" to "permission_denied",
+            "message" to exception.message.toString()
         ))
     }
 
