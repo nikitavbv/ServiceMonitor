@@ -179,7 +179,7 @@ class MetricController(
     fun mapMetric(metricType: String, metricData: MutableMap<*, *>, mapper: ObjectMapper): AbstractMetric {
         return mapper.convertValue(metricData, when (metricType) {
             MetricType.MEMORY.typeName -> MemoryMetric::class.java
-            MetricType.IO.typeName ->IOMetric::class.java
+            MetricType.IO.typeName -> IOMetric::class.java
             MetricType.DISK_USAGE.typeName -> DiskUsageMetric::class.java
             MetricType.CPU.typeName -> CPUMetric::class.java
             MetricType.UPTIME.typeName -> UptimeMetric::class.java
