@@ -47,9 +47,9 @@ class MetricTests {
 
         val printer = ObjectMapper().writer().withDefaultPrettyPrinter()
         mockMvc.perform(post(METRIC_API)
-            .header("Authorization", "API_TOKEN ${agent.apiKey}")
             .contentType(MediaType.APPLICATION_JSON)
             .content(printer.writeValueAsBytes(mapOf(
+                "token" to agent.apiKey,
                 "metrics" to arrayOf(mapOf(
                     "tag" to "memory",
                     "type" to "memory",
@@ -95,9 +95,9 @@ class MetricTests {
 
         val printer = ObjectMapper().writer().withDefaultPrettyPrinter()
         mockMvc.perform(post(METRIC_API)
-            .header("Authorization", "API_TOKEN ${agent.apiKey}")
             .contentType(MediaType.APPLICATION_JSON)
             .content(printer.writeValueAsBytes(mapOf(
+                "token" to agent.apiKey,
                 "metrics" to arrayOf(
                     "just some string",
                     mapOf(
@@ -128,9 +128,9 @@ class MetricTests {
 
         val printer = ObjectMapper().writer().withDefaultPrettyPrinter()
         mockMvc.perform(post(METRIC_API)
-            .header("Authorization", "API_TOKEN ${agent.apiKey}")
             .contentType(MediaType.APPLICATION_JSON)
             .content(printer.writeValueAsBytes(mapOf(
+                "token" to agent.apiKey,
                 "metrics" to arrayOf(
                     mapOf(
                         "tag" to 123456,
@@ -162,9 +162,9 @@ class MetricTests {
 
         val printer = ObjectMapper().writer().withDefaultPrettyPrinter()
         mockMvc.perform(post(METRIC_API)
-            .header("Authorization", "API_TOKEN ${agent.apiKey}")
             .contentType(MediaType.APPLICATION_JSON)
             .content(printer.writeValueAsBytes(mapOf(
+                "token" to agent.apiKey,
                 "metrics" to arrayOf(
                     mapOf(
                         "tag" to "memory",
@@ -195,9 +195,9 @@ class MetricTests {
 
         val printer = ObjectMapper().writer().withDefaultPrettyPrinter()
         mockMvc.perform(post(METRIC_API)
-            .header("Authorization", "API_TOKEN ${agent.apiKey}")
             .contentType(MediaType.APPLICATION_JSON)
             .content(printer.writeValueAsBytes(mapOf(
+                "token" to agent.apiKey,
                 "metrics" to "not an array"
             ))))
             .andExpect(status().isBadRequest)
@@ -237,9 +237,9 @@ class MetricTests {
     fun `test send metric data for non-existing agent`() {
         val printer = ObjectMapper().writer().withDefaultPrettyPrinter()
         mockMvc.perform(post(METRIC_API)
-            .header("Authorization", "API_TOKEN 58d629e7-d0b2-4f67-8a43-7b7416025502")
             .contentType(MediaType.APPLICATION_JSON)
             .content(printer.writeValueAsBytes(mapOf(
+                "token" to "58d629e7-d0b2-4f67-8a43-7b7416025502",
                 "metrics" to arrayOf(mapOf(
                     "tag" to "memory",
                     "type" to "memory",
@@ -264,9 +264,9 @@ class MetricTests {
 
         val printer = ObjectMapper().writer().withDefaultPrettyPrinter()
         mockMvc.perform(post(METRIC_API)
-            .header("Authorization", "API_TOKEN ${agent.apiKey}")
             .contentType(MediaType.APPLICATION_JSON)
             .content(printer.writeValueAsBytes(mapOf(
+                "token" to agent.apiKey,
                 "metrics" to arrayOf(mapOf(
                     "tag" to "memory",
                     "type" to "wrong_type",
