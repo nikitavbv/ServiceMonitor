@@ -103,17 +103,7 @@ data class Agent(
         metricRepositories: MetricRepositories,
         lastEntryId: Long
     ): AbstractMetric {
-        return when (metricType) {
-            MetricType.MEMORY -> metricRepositories.memoryMetricRepository
-            MetricType.IO -> metricRepositories.ioMetricRepository
-            MetricType.DISK_USAGE -> metricRepositories.diskUsageMetricRepository
-            MetricType.CPU -> metricRepositories.cpuMetricRepository
-            MetricType.UPTIME -> metricRepositories.uptimeMetricRepository
-            MetricType.NETWORK -> metricRepositories.networkMetricRepository
-            MetricType.DOCKER -> metricRepositories.dockerMetricRepository
-            MetricType.NGINX -> metricRepositories.nginxMetricRepository
-            MetricType.MYSQL -> metricRepositories.mysqlMetricRepository
-        }.getOne(lastEntryId)
+        return metricRepositories.getRepositoryByMetricType(metricType).getOne(lastEntryId) as AbstractMetric
     }
 
     private fun getMetricTypeByTypeName(metricType: String?): MetricType {

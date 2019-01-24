@@ -14,8 +14,9 @@ import com.github.nikitavbv.servicemonitor.metric.resources.NetworkDeviceDataRep
 import com.github.nikitavbv.servicemonitor.metric.resources.NetworkMetricRepository
 import com.github.nikitavbv.servicemonitor.metric.resources.NginxMetricRepository
 import com.github.nikitavbv.servicemonitor.metric.resources.UptimeMetricRepository
+import org.springframework.data.jpa.repository.JpaRepository
 
-data class MetricRepositories(
+class MetricRepositories(
     val memoryMetricRepository: MemoryMetricRepository,
     val ioMetricRepository: IOMetricRepository,
     val diskUsageMetricRepository: DiskUsageMetricRepository,
@@ -30,4 +31,28 @@ data class MetricRepositories(
     val dockerContainerDataRepository: DockerContainerDataRepository? = null,
     val deviceIORepository: DeviceIORepository? = null,
     val networkDeviceDataRepository: NetworkDeviceDataRepository? = null
-)
+) {
+
+    fun getRepositoryByMetricType(metricType: MetricType): JpaRepository<*, Long> {
+        return when (metricType) {
+            MetricType.MEMORY -> memoryMetricRepository
+            MetricType.IO -> ioMetricRepository
+            MetricType.DISK_USAGE -> diskUsageMetricRepository
+            MetricType.CPU -> cpuMetricRepository
+            MetricType.UPTIME -> uptimeMetricRepository
+            MetricType.NETWORK -> networkMetricRepository
+            else -> getAppMetricRepositoryByMetricType(metricType)
+                ?: throw AssertionError("Unknown metric type: $metricType")
+        }
+    }
+
+    private fun getAppMetricRepositoryByMetricType(metricType: MetricType): JpaRepository<*, Long>? {
+        return when(metricType) {
+            MetricType.DOCKER -> dockerMetricRepository
+            MetricType.NGINX -> nginxMetricRepository
+            MetricType.MYSQL -> mysqlMetricRepository
+            else -> null
+        }
+    }
+
+}
