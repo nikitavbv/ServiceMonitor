@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.nikitavbv.servicemonitor.project.CreateProjectResult
 import com.github.nikitavbv.servicemonitor.project.Project
 import com.github.nikitavbv.servicemonitor.project.ProjectRepository
+import com.github.nikitavbv.servicemonitor.user.ApplicationUser
+import com.github.nikitavbv.servicemonitor.user.ApplicationUserRepository
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNotNull
 import junit.framework.TestCase.assertNull
@@ -24,6 +26,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPat
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.context.WebApplicationContext
 
 @RunWith(SpringRunner::class)
@@ -36,6 +39,9 @@ class ProjectTests {
     @Autowired
     lateinit var projectRepository: ProjectRepository
 
+    @Autowired
+    lateinit var userRepository: ApplicationUserRepository
+
     lateinit var mockMvc: MockMvc
 
     @Before
@@ -47,8 +53,15 @@ class ProjectTests {
     }
 
     @Test
-    @WithMockUser
-    fun `create project`() {
+    @WithMockUser("admin")
+    @Transactional
+    fun createProject() {
+        val user = ApplicationUser(
+            username = "admin",
+            password = "\$2a\$10\$HEXlSrByZSsRozCyDCil1uZmXF1u2v6ky9UdXNkv7u6KdsZVujFZ2" // "password"
+        )
+        userRepository.save(user)
+
         val projectsBeforeTest = projectRepository.count()
         val printer = ObjectMapper().writer().withDefaultPrettyPrinter()
         mockMvc.perform(post(PROJECT_API)
@@ -73,13 +86,14 @@ class ProjectTests {
                         projectInfo.id ?: throw AssertionError("No id set for project")
                     )
                     assertNotNull(project.apiKey)
+                    project.users.clear()
                     projectRepository.delete(project)
                 }
             }
     }
 
     @Test
-    fun `test project api key generation`() {
+    fun testProjectAPIKeyGeneration() {
         val project = Project(name = "Test project")
         assertNull(project.apiKey)
         projectRepository.save(project)
