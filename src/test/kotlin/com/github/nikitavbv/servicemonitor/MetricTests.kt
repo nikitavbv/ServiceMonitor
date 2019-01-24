@@ -63,6 +63,9 @@ class MetricTests {
                     "swapFree" to 697143296
                 ))
             ))))
+            .andDo {
+                println(it.response.contentAsString)
+            }
             .andExpect(status().isOk)
             .andDo {
                 assertEquals(metricEntriesBeforeTest + 1, metricRepository.count())

@@ -21,5 +21,11 @@ enum class MetricType(val typeName: String, val kclass: KClass<*>) {
     NETWORK("network", NetworkMetric::class),
     DOCKER("docker", DockerMetric::class),
     NGINX("nginx", NginxMetric::class),
-    MYSQL("mysql", MysqlMetric::class)
+    MYSQL("mysql", MysqlMetric::class);
+
+    companion object {
+        fun byTypeName(typeName: String): MetricType? {
+            return MetricType.values().find { it.typeName == typeName }
+        }
+    }
 }

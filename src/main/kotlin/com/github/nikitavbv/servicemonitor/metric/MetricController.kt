@@ -176,8 +176,10 @@ class MetricController(
         metricRepository.save(metricBase)
     }
 
-    fun mapMetric(metricType: String, metricData: MutableMap<*, *>, mapper: ObjectMapper): AbstractMetric {
-        return mapper.convertValue(metricData, MetricType.valueOf(metricType).kclass.java) as AbstractMetric
+    fun mapMetric(metricTypeName: String, metricData: MutableMap<*, *>, mapper: ObjectMapper): AbstractMetric {
+        val metricType = MetricType.byTypeName(metricTypeName)
+            ?: throw InvalidParameterValueException("metric_type", "unknown metric type: wrong_type")
+        return mapper.convertValue(metricData, metricType.kclass.java) as AbstractMetric
     }
 
     fun findAgentByAPIToken(apiToken: String): Agent {
